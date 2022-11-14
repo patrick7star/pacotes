@@ -19,9 +19,22 @@ arvore = arvore.arvore
 from sys import argv, platform
 from shutil import move
 from time import sleep
-from os.path import basename, exists
+from os.path import basename, exists, join
 from shutil import rmtree
+from os import chmod, getenv
+from stat import S_IRWXU, S_IXGRP, S_IXOTH
 
+# colocando permisões:
+try:
+   chmod("pacotes.py", S_IRWXU | S_IXGRP | S_IXOTH)
+except FileNotFoundError:
+   caminho = join(
+      getenv("PYTHON_CODES"),
+      "pacotes", 
+      "pacotes.py"
+   )
+   chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
+...
 
 # listando os pacotes ...
 if __debug__:

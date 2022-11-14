@@ -178,11 +178,11 @@ def listagem():
    if not carrega():
       print("já foi carregado.")
    assert len(mapa.keys()) > 0
-   print("\nDisponíveis:".upper())
+   print("\nDisponíveis:\n".upper())
    ultimo = len(mapa) - 1
    for chave in mapa.keys():
       print(
-         " |{espaco:_>6s}{}\t{}"
+         "{espaco:>4s}{}\t{}"
          .format(
             chave, "~ tempo",
             end="\n\n",
