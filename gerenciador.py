@@ -178,8 +178,8 @@ def listagem():
    if not carrega():
       print("já foi carregado.")
    assert len(mapa.keys()) > 0
+
    print("\nDisponíveis:\n".upper())
-   ultimo = len(mapa) - 1
    for chave in mapa.keys():
       print(
          "{espaco:>4s}{}\t{}"
@@ -194,8 +194,9 @@ def listagem():
 ...
 
 __all__ = [
-   "listagem", "carrega", "core"
-   "mapa", "carrega_rust"
+   "listagem", "carrega", 
+   "core" "mapa", 
+   "carrega_rust"
 ]
 
 if __name__ == "__main__":

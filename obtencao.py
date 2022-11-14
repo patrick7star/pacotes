@@ -38,7 +38,7 @@ def faz_download(link, destino):
    elif platform == "linux":
       array = [
          "wget", "--no-cookies",
-         "--no-verbose", "-P",
+         "--quiet", "-P",
          DESTINO, link
       ]
    ...

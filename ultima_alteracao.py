@@ -22,7 +22,7 @@ from python_utilitarios.utilitarios import legivel
 # pega o 'datetime' da estrutura 'ZipInfo',
 # que pode referência um arquivo, ou diretório
 # dentro do 'ZipFile'.
-def extraiDT(zipinfo):
+def extraiDT(zipinfo) -> datetime:
    if type(zipinfo) != ZipInfo:
       assert ValueError()
    tupla = zipinfo.date_time
@@ -43,24 +43,25 @@ def ultima_modificacaoDT(archive) -> datetime:
    return min(extraiDT(zI) for zI in archive.infolist())
 ...
       
-def mais_recente(caminho):
-   archive = ZipFile(caminho)
-   ultima_modificacao = ultima_modificacaoDT(archive).timestamp()
-   hoje = datetime.today().timestamp()
-   decorrido = hoje - ultima_modificacao
-
-   tempo_info = legivel.tempo(decorrido)
-   print(
-      "nome:'{0}'\ntempo:{1:>12.14s}\n"
-      .format(archive.filename, tempo_info)
-   )
-...
-
 __all__ = ["ultima_modificacaoDT"]
 
 if __name__ == "__main__":
    # carrega os links do Python.
    carrega()
+
+   def mais_recente(caminho):
+      archive = ZipFile(caminho)
+      ultima_modificacao = ultima_modificacaoDT(archive).timestamp()
+      hoje = datetime.today().timestamp()
+      decorrido = hoje - ultima_modificacao
+
+      tempo_info = legivel.tempo(decorrido)
+      print(
+         "nome:'{0}'\ntempo:{1:>12.14s}\n"
+         .format(archive.filename, tempo_info)
+      )
+      archive.close()
+   ...
 
    for (nome, link) in mapa.items():
       caminho = faz_download(link, "/tmp/")
