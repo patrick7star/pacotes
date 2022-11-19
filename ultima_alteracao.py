@@ -22,7 +22,7 @@ from python_utilitarios.utilitarios import legivel
 # pega o 'datetime' da estrutura 'ZipInfo',
 # que pode referência um arquivo, ou diretório
 # dentro do 'ZipFile'.
-def extraiDT(zipinfo) -> datetime:
+def extraiDT(zipinfo):
    if type(zipinfo) != ZipInfo:
       assert ValueError()
    tupla = zipinfo.date_time
@@ -43,11 +43,51 @@ def ultima_modificacaoDT(archive) -> datetime:
    return min(extraiDT(zI) for zI in archive.infolist())
 ...
       
-__all__ = ["ultima_modificacaoDT"]
+def mais_recente(caminho):
+   archive = ZipFile(caminho)
+   ultima_modificacao = ultima_modificacaoDT(archive).timestamp()
+   hoje = datetime.today().timestamp()
+   decorrido = hoje - ultima_modificacao
 
-if __name__ == "__main__":
-   # carrega os links do Python.
-   carrega()
+   tempo_info = legivel.tempo(decorrido)
+   print(
+      "nome:'{0}'\ntempo:{1:>12.14s}\n"
+      .format(archive.filename, tempo_info)
+   )
+...
+
+def completa_mapa_python(mapa):
+   novo_mapa = {}
+   for (chave, link) in mapa.items():
+      caminho = faz_download(link, "/tmp")
+      zipado = ZipFile(caminho)
+      ultima_modificacao = ultima_modificacaoDT(zipado)
+      hoje = datetime.today()
+      decorrido = hoje - ultima_modificacao
+      zipado.close()
+      remove(caminho)
+      novo_mapa[chave] = [link, decorrido]
+   ...
+   return novo_mapa
+...
+
+from unittest import TestCase, main
+from pprint import pprint
+from datetime import timedelta
+
+__all__ = ["ultima_modificacaoDT", "completa_mapa_python"]
+
+class Testes(TestCase):
+   def TodaBiblioteca(self):
+      # carrega os links do Python.
+      carrega()
+      for (nome, link) in mapa.items():
+         caminho = faz_download(link, "/tmp/")
+         Testes.mais_recente(caminho)
+         remove(caminho)
+         self.assertTrue(True)
+      ...
+   ...
 
    def mais_recente(caminho):
       archive = ZipFile(caminho)
@@ -60,12 +100,41 @@ if __name__ == "__main__":
          "nome:'{0}'\ntempo:{1:>12.14s}\n"
          .format(archive.filename, tempo_info)
       )
-      archive.close()
    ...
 
-   for (nome, link) in mapa.items():
-      caminho = faz_download(link, "/tmp/")
-      mais_recente(caminho)
-      remove(caminho)
-      assert False
+   def CarregaMapaPython(self):
+      carrega()
+      M = completa_mapa_python(mapa)
+      pprint(M)
+      self.assertNotEqual(M, mapa)
+      for conteudo in M.values():
+         A = type(conteudo[0]) == str
+         B = type(conteudo[1]) == timedelta
+         self.assertTrue(A)
+         self.assertTrue(B)
+      ...
    ...
+
+   def ResultadoDesejadoCMP(self):
+      carrega()
+      M = completa_mapa_python(mapa)
+      print("\nListagem de Mentirinha:")
+      for (cabecalho, array) in M.items():
+         t = array[1].total_seconds()
+         print(
+            "{recuo}{}\t~ {}"
+            .format(
+               cabecalho, 
+               legivel.tempo(t),
+               recuo = ' ' * 5
+            )
+         )
+      # avaliação manual.
+      self.assertTrue(True)
+      ...
+   ...
+      
+...
+
+if __name__ == "__main__":
+   main(verbosity=2)
