@@ -16,7 +16,7 @@ GalhoTipo = arvore.GalhoTipo
 arvore = arvore.arvore
 
 # biblioteca padrão do Python:
-from sys import argv, platform
+from sys import argv
 from shutil import move
 from time import sleep
 from os.path import basename, exists, join
@@ -30,8 +30,7 @@ try:
 except FileNotFoundError:
    caminho = join(
       getenv("PYTHON_CODES"),
-      "pacotes", 
-      "pacotes.py"
+      "pacotes", "pacotes.py"
    )
    chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
 ...
@@ -83,13 +82,14 @@ else:
 
       move(caminho, ".")
       print(
-         "{}\n\"{}\" foi baixado com sucesso." 
-         .format(estrutura, arg), 
+         "{}\n\"{}\" foi baixado com sucesso."
+         .format(estrutura, arg),
          end="\n\n"
       )
    ...
 ...
 
+import platform
 # pausa para ver os output por alguns segundos.
-if platform == "win32":
+if platform.system() == "Windows":
    sleep(5.5)

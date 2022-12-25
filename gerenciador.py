@@ -35,11 +35,11 @@ class Array(array):
       return len(self) == 0
 ...
 
-# guarda cabeçalhos e seus respectivos 
+# guarda cabeçalhos e seus respectivos
 # links anexados.
 mapa = {}
 
-# verifica se todos os cabeçalhos estão 
+# verifica se todos os cabeçalhos estão
 # corretamente fechados ...
 def esta_fechado(string):
    aberto = "[({"
@@ -103,7 +103,7 @@ def filtra(string):
             conteudo.clear()
          ...
       elif char == ']':
-         aglomerador = False 
+         aglomerador = False
          chave = ''.join(cabecalho[0:-1])
          cabecalho.clear()
          mapa[chave] = []
@@ -117,14 +117,14 @@ def filtra(string):
 
 # carrega devidos 'cabeçalhos' e seus possíveis
 # respectivos conteúdos(links dos dados). Retonra
-# um valor lógico dizendo se a tarefa de ser 
+# um valor lógico dizendo se a tarefa de ser
 # carregado foi um sucesso ou não.
 def carrega():
    if len(mapa) > 0:
       return False
 
    caminho = normpath(LINKS)
-   with open(caminho, "rt") as arquivo:
+   with open(caminho, "rt", encoding="utf8") as arquivo:
       filtra(arquivo.read())
 
    # veficando 'cabeçalhos'.
@@ -145,7 +145,7 @@ from versoes import completa_mapa
 def carrega_rust():
    if __debug__:
       print("foi acionado?")
-   with open(LINKS_RUST, "rt") as arquivo:
+   with open(LINKS_RUST, "rt", encoding="utf8") as arquivo:
       if __debug__:
          conteudo = arquivo.read()
          print(conteudo)
@@ -153,7 +153,6 @@ def carrega_rust():
       else:
          filtra(arquivo.read())
    ...
-
    # aplicando versão também.
    novo_mapa = completa_mapa(mapa)
 
@@ -164,7 +163,7 @@ def carrega_rust():
          print("'%s' não têm qualquer link." % chave)
          print("então deletando-o ...", end=" ")
          del mapa[chave]
-         assert chave not in mapa 
+         assert chave not in mapa
          print("feito.")
       else:
          versao = novo_mapa[chave][1]
@@ -194,8 +193,8 @@ def listagem():
 ...
 
 __all__ = [
-   "listagem", "carrega", 
-   "core" "mapa", 
+   "listagem", "carrega",
+   "core" "mapa",
    "carrega_rust"
 ]
 

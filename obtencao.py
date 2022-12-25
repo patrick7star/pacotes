@@ -1,7 +1,7 @@
 """
 A parte que baixa o arquivo e descompacta-o,
 como também move o produto de tais operações
-serão colocadas aqui, por motivos de 
+serão colocadas aqui, por motivos de
 organização(mirando a legibilidade).
 """
 
@@ -33,8 +33,11 @@ def faz_download(link, destino):
 
    if platform == "win32":
       array = ["pwsh", "-Command",
-      "Invoke-WebRequest -Uri",
+      "Invoke-WebRequest","-Uri",
       link, "-OutFile", caminho]
+      import pprint
+      pprint.pprint(array)
+      assert False
    elif platform == "linux":
       array = [
          "wget", "--no-cookies",
@@ -63,7 +66,7 @@ def descompacta(caminho):
    return nome
 ...
 
-# baixa o pacote e descompacta, dado o 
+# baixa o pacote e descompacta, dado o
 # específico "cabeçalho". Retorna o caminho
 # do produto final.
 # NOTA: não funciona em multi-thread, ou
