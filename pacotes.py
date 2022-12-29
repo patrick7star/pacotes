@@ -19,10 +19,11 @@ arvore = arvore.arvore
 from sys import argv
 from shutil import move
 from time import sleep
-from os.path import basename, exists, join
+from os.path import basename, exists, join, isdir
 from shutil import rmtree
 from os import chmod, getenv
 from stat import S_IRWXU, S_IXGRP, S_IXOTH
+from tempfile import gettempdir
 
 # colocando permisões:
 try:
@@ -55,7 +56,6 @@ else:
       print("versão Python acionada.")
 ...
 
-
 if len(argv) == 1:
    if not versao_rust:
       listagem()
@@ -75,12 +75,36 @@ else:
 
       # remove o diretório/arquivo se existente.
       nome_dir = basename(caminho)
+
+      # importante para o manuseio dos pacotes Rust:
+      foi_movido = False
+      # dentro do diretório do código-fonte.
+      artefatos = join(nome_dir, "target")
+      artefatoTemp = join(gettempdir(), "target")
+
       if exists(nome_dir):
+         artefato_existe = isdir(artefatos) and exists(artefatos)
+         # se for o Rust, verificar se 
+         # diretório com artefatos está lá,
+         # já que será mantido.
+         if versao_rust and artefato_existe:
+            assert (not exists(artefatoTemp))
+            move(artefatos, gettempdir())
+            assert exists(artefatoTemp)
+            print("movido para a pasta temporária.")
+            foi_movido = True
+         ...
          rmtree(nome_dir, ignore_errors=True)
          print("'{}' removido.".format(nome_dir))
       ...
 
       move(caminho, ".")
+      if foi_movido:
+         assert (not exists(artefatos))
+         print("movendo de volta!")
+         move(artefatoTemp, nome_dir)
+         assert exists(artefatos)
+      ...
       print(
          "{}\n\"{}\" foi baixado com sucesso."
          .format(estrutura, arg),
