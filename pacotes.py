@@ -1,4 +1,5 @@
 #!/usr/bin/python3 -O
+
 """
 Programa em sí que baixa os pacotes
 e arruma no atual diretório. Também
@@ -18,21 +19,26 @@ arvore = arvore.arvore
 # biblioteca padrão do Python:
 from sys import argv
 from shutil import move
-from time import sleep
+from time import sleep, time
 from os.path import basename, exists, join, isdir
 from shutil import rmtree
 from os import chmod, getenv
 from stat import S_IRWXU, S_IXGRP, S_IXOTH
 from tempfile import gettempdir
+import platform
 
 # colocando permisões:
 try:
    chmod("pacotes.py", S_IRWXU | S_IXGRP | S_IXOTH)
 except FileNotFoundError:
-   caminho = join(
-      getenv("PYTHON_CODES"),
-      "pacotes", "pacotes.py"
-   )
+   sistema = platform.system()
+   if sistema == "Windows":
+      RAIZ = getenv("PythonCodes")
+   elif sistema == "Linux":
+      RAIZ = getenv("PYTHON_CODES")
+   else:
+      raise Exception("não implementado para tal sistema!")
+   caminho = join(RAIZ, "pacotes", "pacotes.py")
    chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
 ...
 
@@ -84,7 +90,7 @@ else:
 
       if exists(nome_dir):
          artefato_existe = isdir(artefatos) and exists(artefatos)
-         # se for o Rust, verificar se 
+         # se for o Rust, verificar se
          # diretório com artefatos está lá,
          # já que será mantido.
          if versao_rust and artefato_existe:
@@ -113,7 +119,15 @@ else:
    ...
 ...
 
-import platform
-# pausa para ver os output por alguns segundos.
+PAUSA = 5.4
+# pausa para ver resultado por alguns segundos.
 if platform.system() == "Windows":
-   sleep(5.5)
+   ti = time()
+   atual = time() - ti
+   while atual < PAUSA:
+      print("\rfechará em {:0.1f}seg".format(atual), end='')
+      sleep(0.1)
+      atual = time() - ti
+   ...
+...
+

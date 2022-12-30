@@ -14,14 +14,14 @@ from zipfile import ZipFile
 import subprocess
 from subprocess import run as Run
 from shutil import move
-from sys import platform
 from copy import copy
+import platform
 
 # computando repositório de primeira.
-if platform == "win32":
+if platform.system() == "Windows":
    core = getenv("PythonCodes")
    core_i = getenv("RustCodes")
-elif platform == "linux":
+elif platform.system() == "Linux":
    core = getenv("PYTHON_CODES")
    core_i = getenv("RUST_CODES")
 ...
@@ -124,6 +124,7 @@ def carrega():
       return False
 
    caminho = normpath(LINKS)
+
    with open(caminho, "rt", encoding="utf8") as arquivo:
       filtra(arquivo.read())
 
@@ -140,8 +141,6 @@ def carrega():
    return True
 ...
 
-from versoes import completa_mapa
-
 def carrega_rust():
    if __debug__:
       print("foi acionado?")
@@ -154,7 +153,9 @@ def carrega_rust():
          filtra(arquivo.read())
    ...
    # aplicando versão também.
+   from versoes import completa_mapa
    novo_mapa = completa_mapa(mapa)
+   del completa_mapa
 
    # veficando 'cabeçalhos'.
    print("\nDISPONÍVEIS(Rust):")
