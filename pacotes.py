@@ -1,5 +1,4 @@
 #!/usr/bin/python3 -O
-
 """
 Programa em sí que baixa os pacotes
 e arruma no atual diretório. Também
@@ -8,8 +7,14 @@ específico a extrair.
 """
 
 # deste programa:
-from gerenciador import carrega, mapa, listagem, carrega_rust
-from obtencao import baixa
+#from gerenciador import carrega, mapa, listagem, carrega_rust
+#from obtencao import baixa
+from gerenciador import (
+   carrega, listagem,
+   listagemI, CORE_PYTHON
+)
+from banco_de_dados import (atualiza_bd, grava_pacote_registro)
+from obtencao import baixa_e_metadados as baixa
 
 # biblioteca externa:
 from python_utilitarios.utilitarios import arvore
@@ -18,108 +23,222 @@ arvore = arvore.arvore
 
 # biblioteca padrão do Python:
 from sys import argv
-from shutil import move
-from time import sleep, time
-from os.path import basename, exists, join, isdir
-from shutil import rmtree
-from os import chmod, getenv
-from stat import S_IRWXU, S_IXGRP, S_IXOTH
-from tempfile import gettempdir
-import platform
+from os.path import (isdir, abspath, basename, exists, join)
+from shutil import (rmtree, move)
+from os import chmod
+from stat import (S_IRWXU, S_IXGRP, S_IXOTH)
+from argparse import (ArgumentParser, SUPPRESS)
 
 # colocando permisões:
 try:
    chmod("pacotes.py", S_IRWXU | S_IXGRP | S_IXOTH)
 except FileNotFoundError:
-   sistema = platform.system()
-   if sistema == "Windows":
-      RAIZ = getenv("PythonCodes")
-   elif sistema == "Linux":
-      RAIZ = getenv("PYTHON_CODES")
-   else:
-      raise Exception("não implementado para tal sistema!")
-   caminho = join(RAIZ, "pacotes", "pacotes.py")
+   caminho = join(CORE_PYTHON, "pacotes/pacotes.py")
    chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
 ...
 
-# listando os pacotes ...
-if __debug__:
-   print("argumentos passados:", argv, end="\n\n")
+menu = ArgumentParser(
+   description = """
+   baixa pacotes Python ou Rust, diretos do GitHub,
+   extraindo-os, e até substituindo os mesmos se já
+   houver diretórios e arquivos com o mesmo nome no
+   diretório da operação.
+   """,
+   prog = "Pacotes",
+   epilog = """Por uma questão de... preguiça, fiz
+   tal programa que tem como objetivo facilitar
+   o downlaod da mais atual versão do código, que
+   sempre que terminado é subido para o GitHub. Ao
+   invés de ficar entre pelo site, e indo diretamente
+   no pacote toda vez, este pega tal, faz download
+   e descompacta o mesmo, se no diretório onde já têm
+   um, substituindo pelo mais novo.
+    O modo como faz isso é seguir o link de um
+   arquivo 'txt', que fica no diretório principal
+   dos códigos de cada linguagem, sem tal, é impossível
+   baixar tais, sequer listar-lôs.""",
+   usage="%(prog)s [OPÇÃO] <NOME_DO_PKG>"
+)
 
-# ativa versão para o Rust packages
-# caso seja pedido.
-versao_rust = False
-if "--rust" in argv:
-   indice = argv.index("--rust")
-   argv.pop(indice)
-   versao_rust = True
-   assert versao_rust
-   print("versão Rust acionada.")
-   del carrega
-else:
-   assert not versao_rust
-   if __debug__:
-      print("versão Python acionada.")
+if __debug__:
+   menu.print_help()
+
+# conteúdo dos arquivos 'txt' com cabeçalhos/links.
+grade = carrega()
+
+# adicionando também versões minúsculas/maiúsculas
+# para que se possa digitar de qualquer ordem.
+def expansao(l) -> list:
+   q = len(l)
+   while q > 0:
+      remocao = l.pop(0)
+      if remocao.lower() in "python-rust":
+         l.append(remocao.capitalize())
+      else:
+         minuscula = remocao.lower()
+         maiusculas = remocao.upper()
+         l.append(minuscula)
+         l.append(maiusculas)
+      ...
+      l.append(remocao)
+      q -= 1
+   ...
+   return l
 ...
 
-if len(argv) == 1:
-   if not versao_rust:
-      listagem()
-   else:
-      carrega_rust()
-else:
-   if versao_rust:
-      if __debug__:
-         print("foi acionado?")
-      carrega_rust()
-   else:
-      carrega()
+menu.add_argument(
+   "--lista", type=str,
+   help="lista os pacotes disponíveis em cada linguagem.",
+   metavar="LANG", nargs=1, default=None,
+   choices = expansao(["python", "rust"])
+)
 
-   for arg in argv[1:]:
-      caminho = baixa(arg, mapa)
+# todos argumentos permitidos.
+permicoes = list(grade["python"].keys())
+permicoes.extend(list(grade["rust"].keys()))
+permicoes.extend(["python", "rust"])
+permicoes = expansao(permicoes)
+
+menu.add_argument(
+   "--obtem", type=str,
+   help="""
+   baixa um dos pacotes listados no atual diretório. Se
+   não houver tal opção, então um erro será emitido. O
+   primeiro argumento é a linguagem desejada, e o segundo
+   é o pacote desejado.""",
+   default=None, nargs=2, metavar=("LANG", "PKG"),
+   choices = permicoes
+)
+menu.add_argument(
+   "--atualiza", required=False,
+   help = """atualiza todas versões/e
+   última alteração dos pacotes.""",
+   action="store_false"
+)
+argumentos = menu.parse_args()
+
+if __debug__:
+   print(argumentos)
+   print(argumentos.lista)
+...
+
+# trabalha específico com o movimento do
+# conteúdo descompactado para o atual
+# diretório. Isto é preciso já que ele
+# poder ter um diretório com o mesmo nome,
+# que então deverá ser substituído, porém
+# com cuidado, já que, pode conter artefatos
+# anteriormente compilados que devem ser
+# mantidos.
+def move_diretorio_rust(caminho, destino) -> None:
+   # closure que verifica se ambos
+   # diretórios dados são Rust.
+   eUmDirRust = (
+      lambda caminho:
+         # existe tal caminho, é um diretório
+         # e têm um arquivo Toml do cargo para
+         # deixar claro que está trabalhando
+         # com um diretório Rust.
+         exists(caminho) and
+         isdir(caminho) and
+         exists(join(caminho, "Cargo.toml"))
+   )
+   # diretório com mesmo nome no atual.
+   mesmo_dir = basename(caminho)
+   # condição para deslocamento cuidadoso.
+   if eUmDirRust(mesmo_dir) and eUmDirRust(caminho):
+      # pasta com testes, debugs e otimizados compilados.
+      artefatos = join(mesmo_dir, "target")
+      artefato_existente = exists(artefatos)
+      if artefato_existente:
+         print("movendo 'target' para '{}'...".format(caminho))
+         move(artefatos, caminho)
+   else:
+      print("o pacote neste dir não tem 'artefatos'.")
+   if eUmDirRust(mesmo_dir):
+      print("removendo '{}'...".format(mesmo_dir))
+      rmtree(mesmo_dir, ignore_errors=True)
+   print("movendo '{}' para '{}'".format(caminho, abspath(".")))
+   move(caminho, ".")
+...
+
+# mesmo acima, porém que para o Python.
+# Por ser geralmente ignorada o diretório
+# com artefatos, porque também seria bem
+# mais difícil a implementação, o código
+# é bem mais simples.
+def move_diretorio_python(caminho, destino) -> None:
+   mesmo_dir = basename(caminho)
+   if exists(mesmo_dir):
+      print("excluíndo '{}'...".format(abspath(mesmo_dir)), end=' ')
+      rmtree(mesmo_dir)
+      print("feito.")
+      assert notexists(mesmo_dir)
+   ...
+   print("movendo '{}' para '{}'".format(caminho, abspath(".")))
+   move(caminho, ".")
+...
+
+# disparando o menu:
+if argumentos.lista is not None:
+   linguagem = argumentos.lista[0]
+   listagemI(grade, linguagem)
+elif argumentos.obtem is not None:
+   # organizando argumentos da linha-de-comando.
+   cabecalho = argumentos.obtem[1]
+   linguagem = argumentos.obtem[0]
+   if __debug__:
+      print(
+         "\n{barra}\nbaixando ... '{}' do {}\n{barra}\n"
+         .format(
+            cabecalho,
+            linguagem.upper(),
+            barra='*' * 50
+         )
+      )
+   else:
+      # carrega "mapa completo".
+      mapa = carrega()
+      # o mapa específico da linguagem.
+      minimapa = mapa[linguagem.lower()]
+      # baixa o download, e recebe tanto o
+      # caminho com o conteúdo, como seus
+      # metadados importantes.
+      (caminho, tempo, versao) = baixa(cabecalho, minimapa)
       estrutura = arvore(caminho, True, GalhoTipo.FINO)
-
-      # remove o diretório/arquivo se existente.
-      nome_dir = basename(caminho)
-
-      # importante para o manuseio dos pacotes Rust:
-      foi_movido = False
-      # dentro do diretório do código-fonte.
-      artefatos = join(nome_dir, "target")
-      artefatoTemp = join(gettempdir(), "target")
-
-      if exists(nome_dir):
-         artefato_existe = isdir(artefatos) and exists(artefatos)
-         # se for o Rust, verificar se
-         # diretório com artefatos está lá,
-         # já que será mantido.
-         if versao_rust and artefato_existe:
-            assert (not exists(artefatoTemp))
-            move(artefatos, gettempdir())
-            assert exists(artefatoTemp)
-            print("movido para a pasta temporária.")
-            foi_movido = True
-         ...
-         rmtree(nome_dir, ignore_errors=True)
-         print("'{}' removido.".format(nome_dir))
-      ...
-
-      move(caminho, ".")
-      if foi_movido:
-         assert (not exists(artefatos))
-         print("movendo de volta!")
-         move(artefatoTemp, nome_dir)
-         assert exists(artefatos)
-      ...
+      link = minimapa[cabecalho]
+      # gravando metadados no banco de dados...
+      grava_pacote_registro(
+         linguagem.lower(),
+         cabecalho, link,
+         versao, tempo
+      )
+      if linguagem.lower() == "rust":
+         move_diretorio_rust(caminho, ".")
+      elif linguagem.lower() == "python":
+         move_diretorio_python(caminho, ".")
+      else:
+         raise Exception("não implementado para tal linguagem!")
+      # info da estrutura do pacote baixado.
       print(
          "{}\n\"{}\" foi baixado com sucesso."
-         .format(estrutura, arg),
+         .format(estrutura, cabecalho),
          end="\n\n"
       )
    ...
-...
+elif argumentos.atualiza is not None:
+   if __debug__:
+      print("atualizando todo BD...")
+   else:
+      mapa = carrega()
+      atualiza_bd(mapa)
+   ...
+else:
+   print("nenhuma opção acionada!")
 
 PAUSA = 5.4
+import platform
+from time import sleep
 # pausa para ver resultado por alguns segundos.
 if platform.system() == "Windows":
    ti = time()
@@ -130,4 +249,3 @@ if platform.system() == "Windows":
       atual = time() - ti
    ...
 ...
-

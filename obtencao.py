@@ -1,7 +1,7 @@
 """
 A parte que baixa o arquivo e descompacta-o,
 como também move o produto de tais operações
-serão colocadas aqui, por motivos de
+serão colocadas aqui, por motivos de 
 organização(mirando a legibilidade).
 """
 
@@ -28,21 +28,18 @@ DESTINO = gettempdir()
 
 # faz o download em sí, e, por fim,
 # retorna o caminho do zip baixado.
-def faz_download(link, destino):
+def faz_download(link: str, destino):
    caminho = join(destino, ZIPADO)
 
    if platform == "win32":
       array = ["pwsh", "-Command",
-      "Invoke-WebRequest","-Uri",
+      "Invoke-WebRequest -Uri",
       link, "-OutFile", caminho]
-      import pprint
-      pprint.pprint(array)
-      assert False
    elif platform == "linux":
       array = [
          "wget", "--no-cookies",
          "--quiet", "-P",
-         DESTINO, link
+         destino, link
       ]
    ...
    # rodando comando em sí.
@@ -66,7 +63,7 @@ def descompacta(caminho):
    return nome
 ...
 
-# baixa o pacote e descompacta, dado o
+# baixa o pacote e descompacta, dado o 
 # específico "cabeçalho". Retorna o caminho
 # do produto final.
 # NOTA: não funciona em multi-thread, ou
@@ -93,61 +90,58 @@ def baixa(cabecalho, dicio):
    return caminho
 ...
 
-if __name__ == "__main__":
-   from python_utilitarios.utilitarios import arvore
-   from python_utilitarios.utilitarios import testes
-   Arvore = arvore.arvore
-   GalhoTipo = arvore.GalhoTipo
-   del arvore
-   from os.path import exists
-   from gerenciador import carrega, mapa
-
-   def testa_procedimento_baixa():
-      if not carrega():
-         print("não possível carregar os 'links'.")
-         return None
-      ...
-
-      caminho = baixa("Efeito do Matrix", mapa)
-      assert exists(caminho)
-      caminhoI = baixa("Utilitarios", mapa)
-      assert exists(caminhoI)
-
-      print(
-         Arvore(
-            caminho,
-            mostra_arquivos=True,
-            tipo_de_galho=GalhoTipo.FINO
-         )
-      )
-      print(Arvore(caminhoI, True))
-
-      # deleta diretórios algum tempo depois.
-      print("deletando ...", end=" ")
-      Run([
-         "pwsh", "-Command",
-         "Remove-Item -LiteralPath",
-         caminho, ',', caminhoI,
-         "-Recurse"
-      ])
-      assert not exists(caminho)
-      assert not exists(caminhoI)
-      print("feito com sucesso.")
-   ...
-
-   def baixa_demandado_pacote():
-      if not carrega():
-         print("não possível carregar os 'links'.")
-         return None
-      ...
-      entrada = input("digite o cabeçalho à baixar: ")
-      caminho = baixa(entrada, mapa)
-      move(caminho, '.')
-   ...
-
-   # executa os testes em sí.
-   testes.executa_teste(
-      #baixa_demandado_pacote,
-      testa_procedimento_baixa,
+from datetime import datetime
+from gerenciador import MiniMapa as MM
+# o mesmo que acima, porém também retorna
+# a versão no caso de pacotes Rust, e
+# o tempo decorrido desde á última alteração.
+Metadados = (str, datetime, str)
+def baixa_e_metadados(cabecalho: str, dicio: MM) -> Metadados:
+   # bibliotecas importantes:
+   from metadados import (
+      ultima_modificacao as UM,
+      descobre_versao
    )
+   from zipfile import ZipFile
+   caminho = faz_download(dicio[cabecalho], DESTINO)
+   # retira a alteração mais recente.
+   with ZipFile(caminho) as arquivo_zip:
+      tempo = UM(arquivo_zip)
+      versao = descobre_versao(arquivo_zip)
+   ...
+   nome_dir = descompacta(caminho)
+   # extrai o trecho "-main" do nome do diretório.
+   novo_nome = join(DESTINO, nome_dir[0:-6])
+   rename(nome_dir, novo_nome)
+   # remove o 'archive' baixado.
+   remove(caminho)
+   # retorna o caminho do diretório que foi
+   # baixado, descompactado e renomeado.
+   caminho = novo_nome
+   # deletando porque não serão mais utilizadas,
+   # nem dentro, nem fora deste escopo.
+   del UM, ZipFile, descobre_versao
+   return (caminho, tempo, versao)
 ...
+
+import unittest
+class Funcoes(unittest.TestCase):
+   def downloadEMetadados(self):
+      from gerenciador import carrega
+      from os.path import exists
+      from shutil import rmtree
+      mapa = carrega()["rust"]
+      info = baixa_e_metadados("Utilitários", mapa)
+      print(info)
+      self.assertTrue(exists(info[0]))
+      rmtree(info[0])
+      self.assertFalse(exists(info[0]))
+      del exists,  rmtree, carrega
+   ...
+
+if __name__ == "__main__":
+   unittest.main()
+...
+
+# o que pode ser importado:
+__all__ = ["baixa_e_metadados", "faz_download"]

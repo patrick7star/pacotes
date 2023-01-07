@@ -8,36 +8,28 @@ atual diretório e substituirá pelo novo.
 
 # bibliotecas padrão do Python:
 from array import array
-from os import system, getenv, remove, rename, popen
-from os.path import join, basename, normcase, normpath
-from zipfile import ZipFile
-import subprocess
-from subprocess import run as Run
-from shutil import move
-from copy import copy
+from os import getenv
+from os.path import join
 import platform
 
 # computando repositório de primeira.
 if platform.system() == "Windows":
-   core = getenv("PythonCodes")
-   core_i = getenv("RustCodes")
+   CORE_PYTHON = getenv("PythonCodes")
+   CORE_RUST = getenv("RustCodes")
 elif platform.system() == "Linux":
-   core = getenv("PYTHON_CODES")
-   core_i = getenv("RUST_CODES")
+   CORE_PYTHON = getenv("PYTHON_CODES")
+   CORE_RUST = getenv("RUST_CODES")
 ...
 
-LINKS = join(core, "links.txt")
-LINKS_RUST = join(core_i, "links.txt")
+# Arquivos contendo links anexados dos pacotes.
+LINK_PYTHON = join(CORE_PYTHON, "links.txt")
+LINK_RUST = join(CORE_RUST, "links.txt")
 
 # adicionando método na "array de valores".
 class Array(array):
    def empty(self):
       return len(self) == 0
 ...
-
-# guarda cabeçalhos e seus respectivos
-# links anexados.
-mapa = {}
 
 # verifica se todos os cabeçalhos estão
 # corretamente fechados ...
@@ -63,8 +55,12 @@ def esta_fechado(string):
    return pilha.empty()
 ...
 
+# apelidos para melhorar a codificação:
+MiniMapa = {str: str}
+Mapa = {str: MiniMapa, str: MiniMapa}
+
 # filtra o cabeçalho e seus respectivos conteúdos.
-def filtra(string):
+def filtra(string) -> MiniMapa:
    if not esta_fechado(string):
       raise Exception("erro na sintaxe do arquivo!")
 
@@ -74,6 +70,8 @@ def filtra(string):
    conteudo = []
    ultima_chave = None
    comecou_comentario = False
+   # dicionário inicialmente vázio.
+   mapa = {}
 
    for (i, char) in enumerate(string):
       if char == '#':
@@ -113,95 +111,123 @@ def filtra(string):
 
    if len(conteudo) > 0:
       mapa[ultima_chave] = "".join(conteudo)
+   return mapa
 ...
 
-# carrega devidos 'cabeçalhos' e seus possíveis
-# respectivos conteúdos(links dos dados). Retonra
-# um valor lógico dizendo se a tarefa de ser
-# carregado foi um sucesso ou não.
-def carrega():
-   if len(mapa) > 0:
-      return False
-
-   caminho = normpath(LINKS)
-
-   with open(caminho, "rt", encoding="utf8") as arquivo:
-      filtra(arquivo.read())
-
-   # veficando 'cabeçalhos'.
-   for chave in mapa.keys():
-      if mapa.get(chave) == []:
-         print("'{}' não têm qualquer link.")
-         print("então deletando-o ...", end=" ")
-         del mapa[chave]
-         assert chave not in mapa
-         print("feito.")
-      ...
-   ...
-   return True
+# primeiro estágio do carregamento dos
+# links dados no programa. Formar um
+# grande dicionário, contendo os links
+# de demais de ambos.
+def carrega() -> Mapa:
+   # mapa conteudo conteúdos.
+   mapa = {"rust": None, "python": None}
+   arq = open(LINK_RUST, "rt", encoding="utf8")
+   # primeiro do Rust...
+   conteudo = arq.read()
+   arq.close()
+   mapa["rust"] = filtra(conteudo)
+   # ... agora do Python.
+   arq = open(LINK_PYTHON, "rt", encoding="utf8")
+   conteudo = arq.read()
+   arq.close()
+   mapa["python"] = filtra(conteudo)
+   return mapa
 ...
 
-def carrega_rust():
-   if __debug__:
-      print("foi acionado?")
-   with open(LINKS_RUST, "rt", encoding="utf8") as arquivo:
-      if __debug__:
-         conteudo = arquivo.read()
-         print(conteudo)
-         filtra(conteudo)
+# lista a linguagem exigida, seja ela
+# Python ou Rust.
+def listagem(mapa: Mapa, tipo: str) -> None:
+   if tipo.lower() not in ("python", "rust"):
+      raise Exception("não implementada para tal opção")
+   print("\nDisponíveis:")
+   for chave in mapa[tipo.lower()].keys():
+      print("\t\b\b\b{}".format(chave))
+   print('')
+...
+
+# listagem com informações completas, usando-se
+# do banco de dados para obter versão, e última
+# mudança feita.
+def listagemI(mapa: Mapa, linguagem: str) -> None:
+   from banco_de_dados import le_pacote_registro
+   from datetime import datetime
+   from python_utilitarios.utilitarios import legivel
+   linguagem = linguagem.lower()
+   if linguagem not in ("python", "rust"):
+      raise Exception("não implementada para tal opção")
+   print("\nDisponíveis:", end="\n\n")
+   for chave in mapa[linguagem].keys():
+      dados = le_pacote_registro(linguagem, chave)
+      if dados is not None:
+         cabecalho = dados[0]
+         versao = dados[2]
+         t = (datetime.today() - dados[3]).total_seconds()
+         if linguagem == "python":
+            print(
+               "\t\b\b\b{:<27s} ~{:<15}"
+               .format(chave, legivel.tempo(t))
+            )
+         elif linguagem == "rust":
+            print(
+               "\t\b\b\b{:<22s} v{:<9} ~{:<15}"
+               .format(chave, versao, legivel.tempo(t))
+            )
+         else:
+            raise Exception("não implementada para tal opção")
       else:
-         filtra(arquivo.read())
+         print("\t\b\b\b{}".format(chave))
    ...
-   # aplicando versão também.
-   from versoes import completa_mapa
-   novo_mapa = completa_mapa(mapa)
-   del completa_mapa
+   del le_pacote_registro, datetime, legivel
+   print('')
+...
 
-   # veficando 'cabeçalhos'.
-   print("\nDISPONÍVEIS(Rust):")
-   for chave in list(mapa.keys()):
-      if mapa[chave] == "":
-         print("'%s' não têm qualquer link." % chave)
-         print("então deletando-o ...", end=" ")
-         del mapa[chave]
-         assert chave not in mapa
-         print("feito.")
-      else:
-         versao = novo_mapa[chave][1]
-         print("\t\b\b\b%s(v%s)" % (chave, versao))
+
+from unittest import TestCase, main
+
+class Funcoes(TestCase):
+   def conteudoDosLinks(self):
+      from pprint import pprint
+      for atual in [LINK_RUST, LINK_PYTHON]:
+         a = open(atual, "rt", encoding="utf8")
+         conteudo = a.read()
+         a.close()
+         pprint(conteudo)
+         conteudo = filtra(conteudo)
+         pprint(conteudo)
       ...
+      del pprint
    ...
-   print("")
+   def carregamentoDoMapa(self):
+      m = carrega()
+      self.assertEqual(len(m), 2)
+      self.assertTrue("python" in m.keys())
+      self.assertTrue("rust" in m.keys())
+      pprint(m)
+      self.assertTrue(len(m["python"]) > 3)
+      self.assertTrue(len(m["rust"]) > 3)
+   ...
+   def Listagem(self):
+      mapa = carrega()
+      listagem(mapa, "rust")
+      listagem(mapa, "python")
+   ...
+   def ListagemDetalhada(self):
+      from os.path import exists
+      from banco_de_dados import CONDENSADO
+      M = carrega()
+      listagemI(M, "python")
+      listagemI(M, "rust")
+      self.assertTrue(exists(CONDENSADO))
+      del exists, CONDENSADO
+   ...
 ...
 
-def listagem():
-   if not carrega():
-      print("já foi carregado.")
-   assert len(mapa.keys()) > 0
-
-   print("\nDisponíveis:\n".upper())
-   for chave in mapa.keys():
-      print(
-         "{espaco:>4s}{}\t{}"
-         .format(
-            chave, "~ tempo",
-            end="\n\n",
-            espaco = ' '
-         )
-      )
-   ...
-   print("\n")
-...
-
+# o que será importado.
 __all__ = [
-   "listagem", "carrega",
-   "core" "mapa",
-   "carrega_rust"
+   "carrega", "listagem",
+   "CORE_RUST", "CORE_PYTHON",
+   "Mapa", "listagemI"
 ]
 
 if __name__ == "__main__":
-   from python_utilitarios.utilitarios import testes
-
-   # executa os testes em sí.
-   testes.executa_teste(listagem)
-...
+   main()
