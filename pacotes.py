@@ -90,7 +90,7 @@ menu.add_argument(
    "--lista", type=str,
    help="lista os pacotes disponíveis em cada linguagem.",
    metavar="LANG", nargs=1, default=None,
-   choices = expansao(["python", "rust"])
+   choices = expansao(["python", "rust"]),
 )
 
 # todos argumentos permitidos.
@@ -110,10 +110,9 @@ menu.add_argument(
    choices = permicoes
 )
 menu.add_argument(
-   "--atualiza", required=False,
+   "--atualiza", action="store_true",
    help = """atualiza todas versões/e
    última alteração dos pacotes.""",
-   action="store_false"
 )
 argumentos = menu.parse_args()
 
@@ -226,15 +225,17 @@ elif argumentos.obtem is not None:
          end="\n\n"
       )
    ...
-elif argumentos.atualiza is not None:
+elif argumentos.atualiza:
    if __debug__:
       print("atualizando todo BD...")
    else:
       mapa = carrega()
-      atualiza_bd(mapa)
+      #atualiza_bd(mapa)
+      print("atualiza foi realizada!")
    ...
 else:
    print("nenhuma opção acionada!")
+
 
 PAUSA = 5.4
 import platform

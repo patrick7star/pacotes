@@ -281,11 +281,46 @@ def permitida() -> (bool, float, float):
    )
 ...
 
+# lê/grava se já houve alguma atualização em 
+# segundo plano, no limite estabelecido.
+def carrega_AB() -> bool:
+   caminho = Join(
+      RAIZ, CORE, 
+      "atualizacao-background.dat"
+   )
+   try:
+      with open(caminho, "rb") as arquivo:
+         conteudo = arquivo.read(1)
+         if conteudo == 0:
+            return False
+         elif conteudo == 255:
+            return True
+         raise Exception(
+            "BD[{}] foi corrompido"
+            .format(caminho)
+         )
+      ...
+   except FileNotFoundError:
+      # em caso de não existe, então nenhuma
+      # atualização na frequência foi realizada.
+      return True
+   ...
+...
+def grava_AB(valor: bool) -> None:
+   caminho = "data/atualizacao-background.dat"
+   with open(caminho, "wb") as arquivo:
+      if valor:
+         arquivo.write(0xFF)
+      else:
+         arquivo.write(0x0)
+   ...
+...
 
 __all__ = [
    "gravaUR", "carregaUR",
    "grava_pacote_registro",
-   "le_pacote_registro"
+   "le_pacote_registro",
+   #"carrega_AB", "grava_AB"
 ]
 
 from time import sleep
