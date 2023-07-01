@@ -37,6 +37,50 @@ except FileNotFoundError:
    chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
 ...
 
+# gera link simbólico se não houver algum.
+def cria_link_simbolico():
+   from pathlib import PosixPath
+   from os import (getcwd,getenv, symlink,chdir)
+
+   arquivo_execucao = PosixPath(CORE_PYTHON, "pacotes/pacotes.py")
+   caminhoI = PosixPath(getenv("HOME"), ".local/usr/sbin")
+   caminhoII = PosixPath(getenv("HOME"), ".local/usr/bin")
+   inicial = getcwd()
+
+   if caminhoI.exists():
+      if __debug__:
+         print("atual diretório:", getcwd())
+      chdir(caminhoI)
+      atual = caminhoI
+      if __debug__:
+         print("atual diretório:", getcwd())
+   elif caminhoII:
+      if __debug__:
+         print("atual diretório:", getcwd())
+      chdir(caminhoII)
+      atual = caminhoII
+      if __debug__:
+         print("atual diretório:", getcwd())
+   else:
+      raise Exception("caminho não encontrado")
+   if __debug__:
+      print("criando link até {} de '{}'".format(arquivo_execucao, atual))
+   else:
+      link_caminho = PosixPath("pacotes")
+      if (not link_caminho.is_symlink()):
+         if __debug__:
+            print("atual diretório:", getcwd())
+         symlink(arquivo_execucao, "pacotes")
+         assert link_caminho.is_symlink()
+         print("link criado!")
+      else:
+         print("link já existe!")
+   ...
+   chdir(inicial)
+   if __debug__:
+      print("atual diretório:", getcwd())
+...
+
 menu = ArgumentParser(
    description = """
    baixa pacotes Python ou Rust, diretos do GitHub,
@@ -178,6 +222,7 @@ def move_diretorio_python(caminho, destino) -> None:
    move(caminho, ".")
 ...
 
+cria_link_simbolico()
 # disparando o menu:
 if argumentos.lista is not None:
    linguagem = argumentos.lista[0]
