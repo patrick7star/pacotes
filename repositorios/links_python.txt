@@ -23,3 +23,7 @@ https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main
 
 [Pacotes]
 https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip
+
+
+[Jogo da Velha]
+https://github.com/patrick7star/velha/archive/refs/heads/main.zip
