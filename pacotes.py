@@ -37,6 +37,7 @@ except FileNotFoundError:
    chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
 ...
 
+import platform
 # gera link simbólico se não houver algum.
 def cria_link_simbolico():
    from pathlib import PosixPath
@@ -222,7 +223,12 @@ def move_diretorio_python(caminho, destino) -> None:
    move(caminho, ".")
 ...
 
-cria_link_simbolico()
+sistema_operacional = platform.platform()
+if sistema_operacional == "Linux":
+   cria_link_simbolico()
+elif sistema_operacional == "Windows":
+   print("sem criação de links(ainda) para Windows.")
+   
 # disparando o menu:
 if argumentos.lista is not None:
    linguagem = argumentos.lista[0]
