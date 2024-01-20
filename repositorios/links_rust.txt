@@ -1,3 +1,6 @@
+# adicionando o pacotes em C inicialmente aqui.
+[Utilitários em C/C++]
+https://github.com/patrick7star/utilitarios-em-c
 
 [Utilitários]
 https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip
