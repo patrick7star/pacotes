@@ -290,7 +290,7 @@ else:
 
 PAUSA = 5.4
 import platform
-from time import sleep
+from time import (sleep, time)
 # pausa para ver resultado por alguns segundos.
 if platform.system() == "Windows":
    ti = time()
