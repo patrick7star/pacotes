@@ -287,12 +287,37 @@ elif argumentos.atualiza:
 else:
    print("nenhuma opção acionada!")
 
+from pathlib import WindowsPath
 
+def esta_no_diretorio_raiz () -> bool:
+   """
+   O program provalvemente funciona, já que exige um arquivo e um diretório
+   no mínimo. A probabilidade de responder corretamente não é 100%.
+   """
+   print ("argumentos passados: %s" % argv)
+   diretorio_presentes = (
+      WindowsPath(".\\data").exists() or
+      WindowsPath(".\\repositorios").exists() or
+      WindowsPath(".\\python_utilitarios").exists()
+   )
+   
+   arquivos_presentes = (
+      WindowsPath (".\\banco_de_dados.py").exists() or
+      WindowsPath (".\\gerenciador.py").exists() or
+      WindowsPath (".\\metadados.py").exists() or
+      WindowsPath (".\\gerenciador.py").exists()
+   )
+
+   arquivo_principal = WindowsPath("pacotes.py").exists()
+   return diretorio_presentes or arquivos_presentes and arquivo_principal
+...
+   
 PAUSA = 5.4
 import platform
 from time import (sleep, time)
-# pausa para ver resultado por alguns segundos.
-if platform.system() == "Windows":
+# pausa para ver resultado por alguns segundos. Apenas aparece se não
+# estiver no diretório raíz do programa.
+if platform.system() == "Windows" and (not esta_no_diretorio_raiz()):
    ti = time()
    atual = time() - ti
    while atual < PAUSA:
