@@ -1,18 +1,12 @@
 #!/usr/bin/python3 -O
 """
-Programa em sí que baixa os pacotes
-e arruma no atual diretório. Também
-é possível selecionar o arquivo
-específico a extrair.
+  Programa em sí que baixa os pacotes e arruma no atual diretório. Também
+é possível selecionar o arquivo específico a extrair.
 """
 
 # deste programa:
-#from gerenciador import carrega, mapa, listagem, carrega_rust
 #from obtencao import baixa
-from gerenciador import (
-   carrega, listagem,
-   listagemI, CORE_PYTHON
-)
+from gerenciador import ( carrega, listagem, listagemI, CORE_PYTHON)
 from banco_de_dados import (atualiza_bd, grava_pacote_registro)
 from obtencao import baixa_e_metadados as baixa
 
@@ -28,6 +22,7 @@ from shutil import (rmtree, move)
 from os import chmod
 from stat import (S_IRWXU, S_IXGRP, S_IXOTH)
 from argparse import (ArgumentParser, SUPPRESS)
+import platform
 
 # colocando permisões:
 try:
@@ -37,9 +32,8 @@ except FileNotFoundError:
    chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
 ...
 
-import platform
 # gera link simbólico se não houver algum.
-def cria_link_simbolico():
+def cria_link_simbolico_no_linux():
    from pathlib import PosixPath
    from os import (getcwd,getenv, symlink,chdir)
 
@@ -81,100 +75,22 @@ def cria_link_simbolico():
    if __debug__:
       print("atual diretório:", getcwd())
 ...
-
-menu = ArgumentParser(
-   description = """
-   baixa pacotes Python ou Rust, diretos do GitHub,
-   extraindo-os, e até substituindo os mesmos se já
-   houver diretórios e arquivos com o mesmo nome no
-   diretório da operação.
-   """,
-   prog = "Pacotes",
-   epilog = """Por uma questão de... preguiça, fiz
-   tal programa que tem como objetivo facilitar
-   o downlaod da mais atual versão do código, que
-   sempre que terminado é subido para o GitHub. Ao
-   invés de ficar entre pelo site, e indo diretamente
-   no pacote toda vez, este pega tal, faz download
-   e descompacta o mesmo, se no diretório onde já têm
-   um, substituindo pelo mais novo.
-    O modo como faz isso é seguir o link de um
-   arquivo 'txt', que fica no diretório principal
-   dos códigos de cada linguagem, sem tal, é impossível
-   baixar tais, sequer listar-lôs.""",
-   usage="%(prog)s [OPÇÃO] <NOME_DO_PKG>"
-)
-
-if __debug__:
-   menu.print_help()
-
-# conteúdo dos arquivos 'txt' com cabeçalhos/links.
-grade = carrega()
-
-# adicionando também versões minúsculas/maiúsculas
-# para que se possa digitar de qualquer ordem.
-def expansao(l) -> list:
-   q = len(l)
-   while q > 0:
-      remocao = l.pop(0)
-      if remocao.lower() in "python-rust":
-         l.append(remocao.capitalize())
-      else:
-         minuscula = remocao.lower()
-         maiusculas = remocao.upper()
-         l.append(minuscula)
-         l.append(maiusculas)
-      ...
-      l.append(remocao)
-      q -= 1
-   ...
-   return l
+def cria_link_simbolico () -> bool:
+   sistema_operacional = platform.platform()
+   if sistema_operacional == "Linux":
+      cria_link_simbolico_no_linux()
+   elif sistema_operacional == "Windows":
+      print("sem criação de links(ainda) para Windows.")
 ...
 
-menu.add_argument(
-   "--lista", type=str,
-   help="lista os pacotes disponíveis em cada linguagem.",
-   metavar="LANG", nargs=1, default=None,
-   choices = expansao(["python", "rust"]),
-)
-
-# todos argumentos permitidos.
-permicoes = list(grade["python"].keys())
-permicoes.extend(list(grade["rust"].keys()))
-permicoes.extend(["python", "rust"])
-permicoes = expansao(permicoes)
-
-menu.add_argument(
-   "--obtem", type=str,
-   help="""
-   baixa um dos pacotes listados no atual diretório. Se
-   não houver tal opção, então um erro será emitido. O
-   primeiro argumento é a linguagem desejada, e o segundo
-   é o pacote desejado.""",
-   default=None, nargs=2, metavar=("LANG", "PKG"),
-   choices = permicoes
-)
-menu.add_argument(
-   "--atualiza", action="store_true",
-   help = """atualiza todas versões/e
-   última alteração dos pacotes.""",
-)
-argumentos = menu.parse_args()
-
-if __debug__:
-   print(argumentos)
-   print(argumentos.lista)
-...
-
-# trabalha específico com o movimento do
-# conteúdo descompactado para o atual
-# diretório. Isto é preciso já que ele
-# poder ter um diretório com o mesmo nome,
-# que então deverá ser substituído, porém
-# com cuidado, já que, pode conter artefatos
-# anteriormente compilados que devem ser
-# mantidos.
 def move_diretorio_rust(caminho, destino) -> None:
+   """
+     Trabalha específico com o movimento do conteúdo descompactado para o 
+   atual diretório. Isto é preciso já que ele poder ter um diretório com o 
+   mesmo nome, que então deverá ser substituído, porém com cuidado, já que,
+   pode conter artefatos anteriormente compilados que devem ser mantidos.
+   """
+
    # closure que verifica se ambos
    # diretórios dados são Rust.
    eUmDirRust = (
@@ -206,12 +122,12 @@ def move_diretorio_rust(caminho, destino) -> None:
    move(caminho, ".")
 ...
 
-# mesmo acima, porém que para o Python.
-# Por ser geralmente ignorada o diretório
-# com artefatos, porque também seria bem
-# mais difícil a implementação, o código
-# é bem mais simples.
 def move_diretorio_python(caminho, destino) -> None:
+   """
+     Mesmo acima, porém que para o Python. Por ser geralmente ignorada o 
+   diretório com artefatos, porque também seria bem mais difícil a 
+   implementação, o código é bem mais simples.
+   """
    mesmo_dir = basename(caminho)
    if exists(mesmo_dir):
       print("excluíndo '{}'...".format(abspath(mesmo_dir)), end=' ')
@@ -223,20 +139,71 @@ def move_diretorio_python(caminho, destino) -> None:
    move(caminho, ".")
 ...
 
-sistema_operacional = platform.platform()
-if sistema_operacional == "Linux":
-   cria_link_simbolico()
-elif sistema_operacional == "Windows":
-   print("sem criação de links(ainda) para Windows.")
+from pathlib import WindowsPath
+from time import (sleep, time)
+
+# tempo total de quanto ela durará.
+PAUSA = 5.4
+
+def esta_no_diretorio_raiz () -> bool:
+   """
+   O program provalvemente funciona, já que exige um arquivo e um diretório
+   no mínimo. A probabilidade de responder corretamente não é 100%.
+   """
+   print ("argumentos passados: %s" % argv)
+   diretorio_presentes = (
+      WindowsPath(".\\data").exists() or
+      WindowsPath(".\\repositorios").exists() or
+      WindowsPath(".\\python_utilitarios").exists()
+   )
+   
+   arquivos_presentes = (
+      WindowsPath (".\\banco_de_dados.py").exists() or
+      WindowsPath (".\\gerenciador.py").exists() or
+      WindowsPath (".\\metadados.py").exists() or
+      WindowsPath (".\\gerenciador.py").exists()
+   )
+
+   arquivo_principal = WindowsPath("pacotes.py").exists()
+   return diretorio_presentes or arquivos_presentes and arquivo_principal
+...
+
+def pausa_para_visualizacao() -> bool:
+   """
+      Pausa para ver resultado por alguns segundos. Apenas aparece se não
+   estiver no diretório raíz do programa.
+
+   """
+   if platform.system() == "Windows" and (not esta_no_diretorio_raiz()):
+      ti = time()
+      atual = time() - ti
+      while atual < PAUSA:
+         print("\rfechará em {:0.1f}seg".format(atual), end='')
+         sleep(0.1)
+         atual = time() - ti
+      ...
+      # confirma que houve apresentação.
+      return True
+   else:
+      # diz que não houve uma, não deve ser válido para a plataforma.
+      return False
+...
+
+from repositorio import cria_novo_repositorio_json
+from menu import (ARGS, GRADE)
+
+# inicializaçã e configuração básica do projeto ...
+cria_novo_repositorio_json()
+cria_link_simbolico()
    
 # disparando o menu:
-if argumentos.lista is not None:
-   linguagem = argumentos.lista[0]
-   listagemI(grade, linguagem)
-elif argumentos.obtem is not None:
-   # organizando argumentos da linha-de-comando.
-   cabecalho = argumentos.obtem[1]
-   linguagem = argumentos.obtem[0]
+if ARGS.lista is not None:
+   linguagem = ARGS.lista[0]
+   listagemI(GRADE, linguagem)
+elif ARGS.obtem is not None:
+   # organizando ARGS da linha-de-comando.
+   cabecalho = ARGS.obtem[1]
+   linguagem = ARGS.obtem[0]
    if __debug__:
       print(
          "\n{barra}\nbaixando ... '{}' do {}\n{barra}\n"
@@ -248,7 +215,8 @@ elif argumentos.obtem is not None:
       )
    else:
       # carrega "mapa completo".
-      mapa = carrega()
+      #mapa = carrega()
+      mapa = GRADE
       # o mapa específico da linguagem.
       minimapa = mapa[linguagem.lower()]
       # baixa o download, e recebe tanto o
@@ -276,53 +244,19 @@ elif argumentos.obtem is not None:
          end="\n\n"
       )
    ...
-elif argumentos.atualiza:
+elif ARGS.atualiza:
    if __debug__:
       print("atualizando todo BD...")
    else:
-      mapa = carrega()
-      #atualiza_bd(mapa)
+      # mapa = carrega()
+      mapa = GRADE
+      atualiza_bd(mapa)
       print("atualiza foi realizada!")
    ...
 else:
    print("nenhuma opção acionada!")
 
-from pathlib import WindowsPath
+# exucação total depende da plataforma executada.
+pausa_para_visualizacao ()
 
-def esta_no_diretorio_raiz () -> bool:
-   """
-   O program provalvemente funciona, já que exige um arquivo e um diretório
-   no mínimo. A probabilidade de responder corretamente não é 100%.
-   """
-   print ("argumentos passados: %s" % argv)
-   diretorio_presentes = (
-      WindowsPath(".\\data").exists() or
-      WindowsPath(".\\repositorios").exists() or
-      WindowsPath(".\\python_utilitarios").exists()
-   )
    
-   arquivos_presentes = (
-      WindowsPath (".\\banco_de_dados.py").exists() or
-      WindowsPath (".\\gerenciador.py").exists() or
-      WindowsPath (".\\metadados.py").exists() or
-      WindowsPath (".\\gerenciador.py").exists()
-   )
-
-   arquivo_principal = WindowsPath("pacotes.py").exists()
-   return diretorio_presentes or arquivos_presentes and arquivo_principal
-...
-   
-PAUSA = 5.4
-import platform
-from time import (sleep, time)
-# pausa para ver resultado por alguns segundos. Apenas aparece se não
-# estiver no diretório raíz do programa.
-if platform.system() == "Windows" and (not esta_no_diretorio_raiz()):
-   ti = time()
-   atual = time() - ti
-   while atual < PAUSA:
-      print("\rfechará em {:0.1f}seg".format(atual), end='')
-      sleep(0.1)
-      atual = time() - ti
-   ...
-...
