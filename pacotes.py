@@ -191,6 +191,8 @@ def pausa_para_visualizacao() -> bool:
 
 from repositorio import cria_novo_repositorio_json
 from menu import (ARGS, GRADE)
+from datetime import datetime as DT
+from banco_de_dados import gravaUR
 
 # inicializaçã e configuração básica do projeto ...
 cria_novo_repositorio_json()
@@ -250,8 +252,8 @@ elif ARGS.atualiza:
    else:
       # mapa = carrega()
       mapa = GRADE
-      atualiza_bd(mapa)
-      print("atualiza foi realizada!")
+      atualiza_bd (mapa)
+      print ("atualiza foi realizada!")
    ...
 else:
    print("nenhuma opção acionada!")

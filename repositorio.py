@@ -34,7 +34,7 @@ import json
 from banco_de_dados import carregaUR
 
 # caminho compatível tanto com Windows como o Linux.
-CAMINHO_JSON_DATA = Path(CORE_PYTHON, "data/repositorios.json")
+CAMINHO_JSON_DATA = Path (CORE_PYTHON, "pacotes", "data/repositorios.json")
 
 def cria_novo_repositorio_json() -> None:
    # carrega dicionário com dados a fazer o JSON, também verifica se ele
@@ -42,8 +42,12 @@ def cria_novo_repositorio_json() -> None:
    dicionario_dados = carrega()
    assert len (dicionario_dados) > 0
 
-   # adiciona último vez que foi feita uma atualização.
-   dicionario_dados["última-atualização"] = carregaUR().timestamp()
+   # adiciona último vez que foi feita uma atualização no JSON.
+   segundos = carregaUR().timestamp()
+   chave = "última-atualização"
+   dicionario_dados[chave] = segundos
+
+   # criando arquivo JSON no determinado diretório...
    arquivo_json = open (CAMINHO_JSON_DATA, "wt", encoding="utf-8")
    json.dump (
       dicionario_dados, arquivo_json,

@@ -17,6 +17,7 @@ from os import getenv, remove
 from obtencao import baixa
 from gerenciador import CORE_PYTHON as RAIZ
 
+# o que será exportado?!
 __all__ = [
    "gravaUR", "carregaUR",
    "grava_pacote_registro",
@@ -49,7 +50,7 @@ ULTIMO_REGISTRO = Join(RAIZ, CORE, "ultima_busca.dat")
 # seja. É útil para dizer que passou
 # minutos, horas ou dias de uma "última
 # operação realizada", seja qual for.
-def gravaUR(dt) -> None:
+def gravaUR(dt: datetime) -> None:
    selo = dt.timestamp()
    # parte-inteira.
    pI = floor(selo)
@@ -232,6 +233,8 @@ from python_utilitarios.utilitarios import legivel
 def atualiza_bd(mapa_geral: Mapa) -> None:
    # obtendo informações...
    (e_hora, decorrido, restante) = permitida()
+   hoje = datetime.today()
+
    if (not e_hora):
       restante = int(restante)
       print(
@@ -243,15 +246,16 @@ def atualiza_bd(mapa_geral: Mapa) -> None:
       # abandonando tal.
       return None
    ...
-   hoje = datetime.today()
+
    for (linguagem, dicio) in mapa_geral.items():
       print(
          "trabalhando com '{}'..."
          .format(linguagem.capitalize())
       )
+
       for cabecalho in dicio.keys():
-         dados = baixa_e_metadados(cabecalho, dicio)
-         (caminho, tempo, versao) = tuple(dados)
+         dados = baixa_e_metadados (cabecalho, dicio)
+         (caminho, tempo, versao) = tuple (dados)
          link = dicio[cabecalho]
          # grava metadados do pacote no banco.
          grava_pacote_registro(
