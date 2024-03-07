@@ -17,6 +17,12 @@ from os import getenv, remove
 from obtencao import baixa
 from gerenciador import CORE_PYTHON as RAIZ
 
+__all__ = [
+   "gravaUR", "carregaUR",
+   "grava_pacote_registro",
+   "le_pacote_registro",
+   #"carrega_AB", "grava_AB"
+]
 
 # ritmo de busca das versões.
 if __debug__:
@@ -222,6 +228,7 @@ def le_pacote_registro(linguagem: str, cabecalho: str):
 from gerenciador import Mapa
 from obtencao import baixa_e_metadados
 from python_utilitarios.utilitarios import legivel
+
 def atualiza_bd(mapa_geral: Mapa) -> None:
    # obtendo informações...
    (e_hora, decorrido, restante) = permitida()
@@ -316,12 +323,6 @@ def grava_AB(valor: bool) -> None:
    ...
 ...
 
-__all__ = [
-   "gravaUR", "carregaUR",
-   "grava_pacote_registro",
-   "le_pacote_registro",
-   #"carrega_AB", "grava_AB"
-]
 
 from time import sleep
 from unittest import main, TestCase
