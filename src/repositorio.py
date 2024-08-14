@@ -27,7 +27,7 @@ Templates:
 __all__ = [
  "aplica_transicao_para_json", "Historico",
   "transforma_antigo_repositorio_em_json",
-  "listagem_do_json"
+  "listagem_do_json", "transforma_historico_em_json"
 ]
 
 # módulos do próprio programa:
@@ -188,7 +188,11 @@ def permitido_realizar_transformacoes() -> (bool, bool):
    contém os linques dos 'pacotes', e o outro é do histórico de downloads
    feitos dos 'pacotes'.
    """
-   from legivel import tempo, HORA, DIA
+   #from legivel import tempo, HORA, DIA
+   from legivel import tempo
+
+   HORA = 3600.0
+   DIA = 24 * HORA
 
    info_do_repositorio = stat(CAMINHO_JSON_DATA)
    info_do_historico = stat(CAMINHO_HISTORICO)

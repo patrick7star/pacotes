@@ -5,7 +5,7 @@
  """
 
 from argparse import ArgumentParser
-from repositorio import carrega_do_json
+from repositorio import carrega_do_json, aplica_transicao_para_json, transforma_antigo_repositorio_em_json, transforma_historico_em_json
 
 __all__ = ["ARGS", "GRADE"]
 
@@ -73,7 +73,7 @@ if __debug__: menu.print_help()
 menu.add_argument(
    "--lista", type=str,
    help="lista os pacotes disponíveis em cada linguagem.",
-   metavar="LANG", nargs=1, default=None,
+   metavar="LANG", nargs='*', default=None,
    choices = expansao(["python", "rust"]),
 )
 
@@ -82,7 +82,15 @@ menu.add_argument(
 # compatibilidade de trazer todo este código para este módulo. Um modo 
 # talvez de tirar tal sobrecarga seria enviar o carregado aqui também
 # junto com a instância de menu.
-GRADE = carrega_do_json()
+try:
+   GRADE = carrega_do_json()
+except FileNotFoundError:
+   print("Ainda não foi transionado para JSON, então...",end=" ")
+   transforma_historico_em_json()
+   transforma_antigo_repositorio_em_json()
+   aplica_transicao_para_json()
+   GRADE = carrega_do_json()
+   print("feito")
 
 menu.add_argument(
    "--obtem", type=str,
