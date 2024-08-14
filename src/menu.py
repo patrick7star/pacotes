@@ -1,11 +1,12 @@
-
 """ 
    Trazer o menu para cá, pois organiza mais o módulo principal, e também
  estes trechos, referente ao 'menu' digo.
  """
 
 from argparse import ArgumentParser
+#from repositorio import carrega_do_json
 from repositorio import carrega_do_json, aplica_transicao_para_json, transforma_antigo_repositorio_em_json, transforma_historico_em_json
+
 
 __all__ = ["ARGS", "GRADE"]
 
@@ -41,7 +42,6 @@ def todos_pkg_disponiveis(grid: dict) -> set:
    if __debug__: print(tudo)
    return tudo
 ...
-
 
 menu = ArgumentParser(
    description = """
@@ -82,6 +82,7 @@ menu.add_argument(
 # compatibilidade de trazer todo este código para este módulo. Um modo 
 # talvez de tirar tal sobrecarga seria enviar o carregado aqui também
 # junto com a instância de menu.
+#GRADE = carrega_do_json()
 try:
    GRADE = carrega_do_json()
 except FileNotFoundError:
@@ -91,6 +92,7 @@ except FileNotFoundError:
    aplica_transicao_para_json()
    GRADE = carrega_do_json()
    print("feito")
+...
 
 menu.add_argument(
    "--obtem", type=str,
@@ -101,6 +103,12 @@ menu.add_argument(
    é o pacote desejado.""",
    default=None, nargs=2, metavar=("LANG", "PKG"),
    choices = todos_pkg_disponiveis(GRADE)
+)
+menu.add_argument(
+   "-i", "--lista-info", action="store_const", const=True,
+   help="""
+   Lista todos pacotes, porém com informações mais detalhadas, tipo
+   a última vez que ele foi atualizado no GitHub. """
 )
 menu.add_argument(
    "--atualiza", action="store_true",
