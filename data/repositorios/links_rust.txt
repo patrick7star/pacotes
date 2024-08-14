@@ -27,7 +27,3 @@ https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip
 
 [Buscador de Primos]
 https://github.com/patrick7star/primos/archive/refs/heads/main.zip
-
-# adicionando o pacotes em C inicialmente aqui.
-[Utilitários em C/C++]
-https://github.com/patrick7star/utilitarios-em-c/archive/refs/heads/main.zip
