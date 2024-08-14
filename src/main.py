@@ -5,7 +5,7 @@
 """
 
 # módulos deste programa(foram separados daqui por motivos de organização):
-from gerenciador import ( carrega, listagem, listagemI)
+from gerenciador import (listagem, listagemI)
 from banco_de_dados import (atualiza_bd, grava_pacote_registro, gravaUR)
 from obtencao import baixa_e_metadados as baixa
 from repositorio import (
@@ -20,18 +20,18 @@ from menu import ARGS
 from windows import *
 from manuseio import *
 # biblioteca padrão do Python:
-from argparse import (ArgumentParser, SUPPRESS)
-from datetime import datetime as DT
-from pprint import pprint
 from pathlib import Path
 # biblioteca externa:
-from dados import arvore, GalhoTipo
+from dados import arvore, GalhoTipo, PROG_DIR
 
 
 def iniciar_programa() -> None:
-   cria_link_simbolico()
+   caminho_link = cria_link_simbolico()
    alterando_permissao_do_arquivo()
    GRADE = carrega_do_json()
+
+   if __debug__:
+      print("O linque foi criado com sucesso?", caminho_link)
       
    if ARGS.lista is not None:
       listagem_do_json(GRADE)
@@ -52,6 +52,10 @@ def iniciar_programa() -> None:
       mapa = GRADE
       atualiza_bd (mapa)
       print ("Atualiza foi realizada!")
+
+   elif ARGS.lista_info:
+      for lang in ["python", "rust"]:
+         listagemI(GRADE, lang)
 
    else:
       print("Nenhuma opção acionada!")

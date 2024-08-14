@@ -33,7 +33,7 @@ __all__ = [
 # módulos do próprio programa:
 from gerenciador import (Mapa, carrega)
 from banco_de_dados import carregaUR
-from dados import legivel, CORE_PYTHON 
+from dados import legivel, PROG_DIR
 # biblioteca padrão do Python:
 from pathlib import Path, PosixPath
 import json, unittest
@@ -46,12 +46,9 @@ from time import time
 
 
 # caminho compatível tanto com Windows como o Linux.
-CAMINHO_JSON_DATA = Path (CORE_PYTHON, "pacotes", "data/repositorios.json")
-CAMINHO_HISTORICO = PosixPath(CORE_PYTHON, "pacotes", "data/historico.json")
-DADOS_CONDENSADOS_PATH = PosixPath(
-   CORE_PYTHON, "pacotes/data", 
-   "dados-condensados.txt"
-)
+CAMINHO_JSON_DATA = PROG_DIR.joinpath("data", "repositorios.json")
+CAMINHO_HISTORICO = PROG_DIR.joinpath("data", "historico.json")
+DADOS_CONDENSADOS_PATH = PROG_DIR.joinpath( "data", "dados-condensados.txt")
 # Configurações gerais:
 RECUO = ' ' * 4
 # Apelidos de alguns retornos:
@@ -62,9 +59,8 @@ def transforma_antigo_repositorio_em_json() -> None:
    dicionario_dados = carrega()
 
    if len (dicionario_dados) == 0:
-      REGISTRO_DE_DOWNLOADS = PosixPath(
-         CORE_PYTHON, "pacotes/data" 
-         "dados-condensados.txt"
+      REGISTRO_DE_DOWNLOADS = PROG_DIR.joinpath(
+         "data", "dados-condensados.txt"
       )
       if (not REGISTRO_DE_DOWNLOADS.exists()):
          raise FileExistsError("arquivo com registro não existe!")

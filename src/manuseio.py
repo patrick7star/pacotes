@@ -17,7 +17,7 @@ from shutil import (rmtree, move)
 from stat import (S_IRWXU, S_IXGRP, S_IXOTH)
 from os.path import (isdir, abspath, basename, exists, join)
 from os import (chmod, getenv)
-from gerenciador import CORE_PYTHON
+from dados import PROG_DIR
 
 def alterando_permissao_do_arquivo() -> None:
    NOME_SRC = "main.py"
@@ -28,7 +28,7 @@ def alterando_permissao_do_arquivo() -> None:
       if __debug__:
          print("tentando alteração por 'caminho absoluto' ...", end=' ')
 
-      caminho = join(CORE_PYTHON, "pacotes/src", NOME_SRC)
+      caminho = PROG_DIR.joinpath("src", NOME_SRC)
       chmod(caminho, S_IRWXU | S_IXGRP | S_IXOTH)
 
       if __debug__:

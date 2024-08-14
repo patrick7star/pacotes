@@ -8,15 +8,15 @@ from array import array as FixedArray
 from os.path import join
 from pathlib import Path
 from unittest import TestCase, main
-from dados import CORE_PYTHON, CORE_RUST
+from dados import CORE_PYTHON, CORE_RUST, PROG_DIR
 
 # o que será importado.
 __all__ = ["carrega", "listagem", "Mapa", "listagemI"]
 
 # Arquivos contendo links anexados dos pacotes.
-BASE_RPT = Path("pacotes/data/repositorios")
-LINK_PYTHON = CORE_PYTHON.joinpath(BASE_RPT, "links_python.txt")
-LINK_RUST = CORE_PYTHON.joinpath(BASE_RPT, "links_rust.txt")
+BASE_RPT = PROG_DIR.joinpath("data", "repositorios")
+LINK_PYTHON = BASE_RPT.joinpath("links_python.txt")
+LINK_RUST = BASE_RPT.joinpath("links_rust.txt")
 
 # apelidos para melhorar a codificação:
 MiniMapa = {str: str}
@@ -142,7 +142,8 @@ def listagemI(mapa: Mapa, linguagem: str) -> None:
    """
    from banco_de_dados import le_pacote_registro
    from datetime import datetime
-   from python_utilitarios.utilitarios import legivel
+   #from python_utilitarios.utilitarios import legivel
+   from dados import legivel
 
    linguagem = linguagem.lower()
    if linguagem not in ("python", "rust"):

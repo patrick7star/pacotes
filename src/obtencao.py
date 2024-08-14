@@ -103,6 +103,11 @@ def baixa_e_metadados(cabecalho: str, dicio: MM) -> Metadados:
    return (caminho, tempo, versao)
 ...
 
+''' === === === === === === === === === === === === === === === === === ==
+                           Testes Unitários
+                      e alguns Testes de Features
+
+ === === === === === === === === === === === === === === === === === == '''
 class Funcoes(unittest.TestCase):
    def downloadEMetadados(self):
       from gerenciador import carrega
