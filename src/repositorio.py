@@ -27,7 +27,7 @@ Templates:
 __all__ = [
  "aplica_transicao_para_json", "Historico",
   "transforma_antigo_repositorio_em_json",
-  "listagem_do_json", "transforma_historico_em_json"
+  "listagem_do_json"
 ]
 
 # módulos do próprio programa:
@@ -188,11 +188,7 @@ def permitido_realizar_transformacoes() -> (bool, bool):
    contém os linques dos 'pacotes', e o outro é do histórico de downloads
    feitos dos 'pacotes'.
    """
-   #from legivel import tempo, HORA, DIA
-   from legivel import tempo
-
-   HORA = 3600.0
-   DIA = 24 * HORA
+   from legivel import tempo, HORA, DIA
 
    info_do_repositorio = stat(CAMINHO_JSON_DATA)
    info_do_historico = stat(CAMINHO_HISTORICO)
@@ -234,6 +230,7 @@ def permitido_realizar_transformacoes() -> (bool, bool):
    )
 ...
 
+
 def aplica_transicao_para_json() -> None:
    saida = permitido_realizar_transformacoes()
    (repository_allowed, history_allowed) = saida
@@ -258,6 +255,10 @@ def aplica_transicao_para_json() -> None:
          remove(CAMINHO_HISTORICO)
          transforma_historico_em_json()
    ...
+
+   # Trecho verifica se o JSON têm a chave c&cplusplus, se não tiver, então
+   # adiciona uma com o único linque até o momento.
+   anexa_c_repositorio()
 ...
 
 def carrega_do_json() -> Mapa:
@@ -368,6 +369,57 @@ def listagem_do_json(grid: dict) -> None:
    ...
 ...
 
+def anexa_c_repositorio() -> None:
+   C_CHAVE = "c_e_cplusplus"
+   (ESCRITA, LEITURA) = ("wt", "rt")
+   REPOSITORIO = [
+      (
+         "Utilitários em C",
+         "https://github.com/patrick7star/utilitarios-em-c/archive/refs"
+         + "/heads/main.zip"
+      ),
+      (
+         "Outros Linques ...",
+         "https://github.com/patrick7star/outros-linques-archive"
+      )
+   ]
+   # Lendo e analisando o JSON dado...
+   with open(CAMINHO_JSON_DATA, LEITURA, encoding="utf8") as stream:
+      data = json.load(stream, parse_float=float)  
+      existe_tal_chave = C_CHAVE in data
+      houve_alguma_mudancao = False
+
+      if __debug__:
+         print("\nListando as chaves ...")
+
+         for key in data.keys():
+            print("\t - {}".format(key))
+
+         print("\nHá uma chave 'C/C++'?", existe_tal_chave)
+
+      # Se não houver tal repostório para C/C++, então colocarei um.
+      if (not existe_tal_chave):
+         for (nome, linque) in REPOSITORIO:
+            try:
+               data[C_CHAVE][nome] = linque 
+            except KeyError:
+               # Neste caso cria o dicionário primeiramente...
+               data[C_CHAVE] = {}
+               data[C_CHAVE][nome] = linque
+
+         houve_alguma_mudancao = True
+
+   # Escrevendo a mudança decorrida nele...
+   if houve_alguma_mudancao:
+      stream = open(CAMINHO_JSON_DATA, ESCRITA, encoding='utf8')
+      json.dump (
+         data, stream, indent=RECUO, sort_keys=True,
+         ensure_ascii = False
+      )
+      stream.close()
+
+      if __debug__:
+         print("Dados do JSON foram atualizados com sucesso.")
 
 #  Testes unitários de funções mesmo que sejam auxiliares; classes e seus 
 # métodos acima; até mesmo utilitários da linguagem ou de alguma biblioteca.
@@ -417,4 +469,7 @@ class Unitarios (unittest.TestCase):
       segs = ultima_atualicao_realizada().total_seconds()
 
       print("{}".format(legivel.tempo(segs)))
+
+   def anexacao_da_parte_de_c_e_cplusplus(self):
+      anexa_c_repositorio()
 ...

@@ -28,6 +28,7 @@ from dados import arvore, GalhoTipo, PROG_DIR
 def iniciar_programa() -> None:
    caminho_link = cria_link_simbolico()
    alterando_permissao_do_arquivo()
+   aplica_transicao_para_json()
    GRADE = carrega_do_json()
 
    if __debug__:
