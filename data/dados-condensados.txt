@@ -16,13 +16,13 @@ Anel::www.anel.com::None::1747191600.0::python
 Guarda-Roupa::www.guardaroupaoutralinguagem.com::v3.0.19::1684810800.0::rust
 Teclado::www.meuteclado.com::v0.1.3::1725591600.0::rust
 Porta::www.thedoorrings.com::v1.5.9::1754967600.0::rust
-UtilitÃ¡rios::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
-UtilitÃ¡rios::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
 Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.4.2::1670421826.0::rust
 Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.2.12::1663966924.0::rust
 Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
-LÃ¢mpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
-Cobrinha ClÃ¡ssica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
 Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.1::1661223892.0::rust
 Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.0::1672276542.0::rust
 Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1672302180.0::python
@@ -30,14 +30,14 @@ Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/hea
 Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
 Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1668194424.0::python
 Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
 Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1672858236.0::python
-UtilitÃ¡rios::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
 Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.4.2::1670421826.0::rust
 Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.2.12::1663966924.0::rust
 Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
-LÃ¢mpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
-Cobrinha ClÃ¡ssica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
 Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.1::1661223892.0::rust
 Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.0::1672276542.0::rust
 Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1672302180.0::python
@@ -45,14 +45,14 @@ Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/hea
 Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
 Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1668194424.0::python
 Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
 Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1672915616.0::python
-UtilitÃ¡rios::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
 Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.4.2::1670421826.0::rust
 Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.2.12::1663966924.0::rust
 Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
-LÃ¢mpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
-Cobrinha ClÃ¡ssica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
 Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.1::1661223892.0::rust
 Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.0::1672276542.0::rust
 Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1672302180.0::python
@@ -60,14 +60,14 @@ Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/hea
 Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
 Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1668194424.0::python
 Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
 Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1672915616.0::python
-UtilitÃ¡rios::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.3.5::1668077488.0::rust
 Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.4.2::1670421826.0::rust
 Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.2.12::1663966924.0::rust
 Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
-LÃ¢mpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
-Cobrinha ClÃ¡ssica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
 Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.1::1661223892.0::rust
 Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.0::1672276542.0::rust
 Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1672302180.0::python
@@ -75,7 +75,7 @@ Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/hea
 Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
 Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1668194424.0::python
 Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
 Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1672944678.0::python
 Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/heads/main.zip::None::1669855364.0::python
 Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1668194424.0::python
@@ -90,10 +90,113 @@ Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/ma
 Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.0::1672276542.0::rust
 Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.0::1672276542.0::rust
 Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.0::1672276542.0::rust
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
 Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
-Vim ConfiguraÃ§Ãµes::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1666592820.0::python
 Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1673090954.0::python
 Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1673090954.0::python
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.6::1692908286.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.5.3::1699577116.0::rust
+Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.4.1::1705512924.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.2::1690646532.0::rust
+Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.6::1692908286.0::rust
+Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1701107196.0::python
+Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/heads/main.zip::None::1674156634.0::python
+Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
+Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1708695514.0::python
+Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1706442624.0::python
+Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1709819146.0::python
+Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1701107196.0::python
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.5.3::1699577116.0::rust
+Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.4.1::1705512924.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.2::1690646532.0::rust
+Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.6::1692908286.0::rust
+Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1701107196.0::python
+Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/heads/main.zip::None::1674156634.0::python
+Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
+Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1708695514.0::python
+Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1706442624.0::python
+Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1709819146.0::python
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.5.3::1699577116.0::rust
+Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.4.1::1705512924.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.2::1690646532.0::rust
+Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.6::1692908286.0::rust
+Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1701107196.0::python
+Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/heads/main.zip::None::1674156634.0::python
+Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
+Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1708695514.0::python
+Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1706442624.0::python
+Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1709819146.0::python
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.5.3::1699577116.0::rust
+Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.4.1::1705512924.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.0.2::1667052968.0::rust
+Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.2::1690646532.0::rust
+Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.6::1692908286.0::rust
+Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1701107196.0::python
+Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/heads/main.zip::None::1674156634.0::python
+Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
+Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1708695514.0::python
+Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1706442624.0::python
+Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1709833822.0::python
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Alterna Wallpapers::https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip::0.5.5::1710526950.0::rust
+Limpa Downloads::https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip::0.4.1::1705512924.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Lâmpada Simples::https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip::0.1.0::1634413572.0::rust
+Cobrinha Clássica::https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip::1.1.0::1714677880.0::rust
+Texto Desenhado::https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip::0.3.2::1690646532.0::rust
+Buscador de Primos::https://github.com/patrick7star/primos/archive/refs/heads/main.zip::1.1.6::1692908286.0::rust
+Utilitarios::https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip::None::1701107196.0::python
+Efeito do Matrix::https://github.com/patrick7star/matrix-efeito/archive/refs/heads/main.zip::None::1674156634.0::python
+Jogo da Forca::https://github.com/patrick7star/forca/archive/refs/heads/main.zip::None::1659878972.0::python
+Desligamento Automatico::https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip::None::1708695514.0::python
+Ferramentas de Tempo::https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip::None::1660660740.0::python
+Vim Configurações::https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip::None::1706442624.0::python
+Pacotes::https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip::None::1709856444.0::python
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Utilitários::https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip::1.5.0::1706340822.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
+Bate-Bola::https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip::0.2.1::1643978016.0::rust
