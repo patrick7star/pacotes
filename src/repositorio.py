@@ -27,7 +27,9 @@ Templates:
 __all__ = [
  "aplica_transicao_para_json", "Historico",
   "transforma_antigo_repositorio_em_json",
-  "listagem_do_json"
+  "listagem_do_json",
+  "adiciona_novo_registro",
+  "listagem_info_dos_pacotes"
 ]
 
 # módulos do próprio programa:
@@ -39,10 +41,12 @@ from pathlib import Path, PosixPath
 import json, unittest
 from os import remove, stat
 from io import TextIOBase
-from datetime import datetime as DateTime, timedelta as Duration
+from datetime import (datetime as DateTime, timedelta as Duration)
 from dataclasses import dataclass
 from collections.abc import (Iterator, Sequence)
 from time import time
+# Bibliotecas externas:
+from legivel import (tempo, HORA, DIA)
 
 
 # caminho compatível tanto com Windows como o Linux.
@@ -52,6 +56,8 @@ DADOS_CONDENSADOS_PATH = PROG_DIR.joinpath( "data", "dados-condensados.txt")
 # Configurações gerais:
 RECUO = ' ' * 4
 # Apelidos de alguns retornos:
+(ESCRITA, LEITURA) = ("wt", "rt")
+C_CHAVE = "c++"
 
 def transforma_antigo_repositorio_em_json() -> None:
    # carrega dicionário com dados a fazer o JSON, também verifica se ele
@@ -188,7 +194,6 @@ def permitido_realizar_transformacoes() -> (bool, bool):
    contém os linques dos 'pacotes', e o outro é do histórico de downloads
    feitos dos 'pacotes'.
    """
-   from legivel import tempo, HORA, DIA
 
    info_do_repositorio = stat(CAMINHO_JSON_DATA)
    info_do_historico = stat(CAMINHO_HISTORICO)
@@ -228,33 +233,28 @@ def permitido_realizar_transformacoes() -> (bool, bool):
       decorrido > LIMITE_DO_REPOSITORIO, 
       outro_decorrido > LIMITE_DO_HISTORICO
    )
-...
-
 
 def aplica_transicao_para_json() -> None:
    saida = permitido_realizar_transformacoes()
    (repository_allowed, history_allowed) = saida
 
-   try:
-      transforma_antigo_repositorio_em_json()
-   except FileExistsError:
-      print("Já existe tal repositório em JSON.")
-      if repository_allowed:
+   if repository_allowed:
+      try:
+         transforma_antigo_repositorio_em_json()
+      except FileExistsError:
+         print("Já existe tal repositório em JSON.")
          print("removendo '{} ...'".format(CAMINHO_JSON_DATA))
          remove(CAMINHO_JSON_DATA)
          transforma_antigo_repositorio_em_json()
-      ...
-   ...
 
-   try:
-      transforma_historico_em_json()
-   except FileExistsError:
-      print("Já existe tal repositório em JSON.")
-      if history_allowed:
+   if history_allowed:
+      try:
+         transforma_historico_em_json()
+      except FileExistsError:
+         print("Já existe tal repositório em JSON.")
          print("removendo '{} ...'".format(CAMINHO_HISTORICO))
          remove(CAMINHO_HISTORICO)
          transforma_historico_em_json()
-   ...
 
    # Trecho verifica se o JSON têm a chave c&cplusplus, se não tiver, então
    # adiciona uma com o único linque até o momento.
@@ -296,6 +296,13 @@ def ultima_atualicao_realizada() -> Duration:
 ...
 
 def adiciona_novo_registro(n: dict) -> None:
+   """
+     Converte o dicionário com novo registro baixado para uma array, então
+   o coloca no histórico em JSON do programa.
+
+   Nota: É preciso que o dicionário passado tenha os seguintes campos: nome,
+   linque, linguagem, versão e selo de tempo.
+   """
    assert (CAMINHO_HISTORICO.exists())
    assert (
       ("nome" in n) and ("linque" and n) and 
@@ -303,19 +310,12 @@ def adiciona_novo_registro(n: dict) -> None:
       ("tempo" in n) and (isinstance(n["tempo"], DateTime))
    )
 
-   with open(CAMINHO_HISTORICO,"rt", encoding='latin1') as arquivo:
-      decorrido = DateTime.today() - n["tempo"]
-      if __debug__:
-         print(
-            "visualizando tempo em decimal: {}"
-            .format(decorrido.total_seconds())
-         )
-      ...
+   with open(CAMINHO_HISTORICO, LEITURA, encoding='latin1') as arquivo:
       array = [
          # Nome, linque e a versão:
          n["nome"], n["linque"], n["versao"], 
          # Marca-de-tempo e a linguagem:
-         decorrido.total_seconds(), n["linguagem"]
+         n["tempo"].timestamp(), n["linguagem"]
       ]
       # A ordem dos dados extraídos são o seguinte: nome, linque, versão,
       # marca-de-tempo(decimal) e linguagem.
@@ -324,6 +324,7 @@ def adiciona_novo_registro(n: dict) -> None:
       assert (isinstance(historico_array, list))
       if __debug__:
          quantia_antes = len(historico_array)
+         print("Array a ser incluída:\n{}".format(array))
 
       # Serializa o novo, e a põe no final da array.
       historico_array.append(array)
@@ -335,19 +336,18 @@ def adiciona_novo_registro(n: dict) -> None:
             % (quantia_antes, quantia_depois)
          )
          n = quantia_depois - 1
+         print("Penúltimo item: {}".format(historico_array[n - 1]))
          print("Último item: {}".format(historico_array[n]))
          assert (quantia_depois == quantia_antes + 1)
-      ...
 
+   with open(CAMINHO_HISTORICO, ESCRITA, encoding='latin1') as arquivo:
       assert (all(isinstance(h, list) for h in historico_array))
       json.dump(historico_array, arquivo, indent=RECUO, ensure_ascii=False)
-   ...
-...
 
 def listagem_do_json(grid: dict) -> None:
    print("\nTodo conteúdo que pode ser baixado:")
    RECUO = " " * 3
-   EXCECOES = {"c_e_cplusplus": "C/C++"}
+   EXCECOES = {C_CHAVE: "C/C++"}
 
    def reprocessar(key: str) -> str:
       if key in EXCECOES:
@@ -370,8 +370,6 @@ def listagem_do_json(grid: dict) -> None:
 ...
 
 def anexa_c_repositorio() -> None:
-   C_CHAVE = "c_e_cplusplus"
-   (ESCRITA, LEITURA) = ("wt", "rt")
    REPOSITORIO = [
       (
          "Utilitários em C",
@@ -421,9 +419,109 @@ def anexa_c_repositorio() -> None:
       if __debug__:
          print("Dados do JSON foram atualizados com sucesso.")
 
+def listagem_info_dos_pacotes(grade: dict) -> None:
+   checagem = {}
+   indice = -1
+
+   # Marcando cada pacote, de cada linguagem, como ainda não checado.
+   for lang in grade.keys():
+      for package in grade[lang]:
+         checagem[(package, lang)] = False
+   # Percentual limite para considerar como "todos" foram checados.
+   FRACAO = 1 / len(checagem)
+   LIMITE = 1 - FRACAO
+   # Função anônima que calcula o percentual de checagens da grade.
+   percentual_checked = (
+      lambda valores_verdades: (
+         sum(
+            map(
+               # Função que adiciona uma fração de a entrada já foi checada
+               # e 0 percentual caso o contrário.
+               lambda V: FRACAO if V else 0, 
+               valores_verdades.values()
+            )
+         )
+      )
+   )
+
+   if __debug__:
+      print(
+         "FRAÇÃO: {:0.2f}%\tLIMITE:{:0.2f}%\nchecagem: {}"
+         .format(FRACAO * 100, 100 * LIMITE, checagem)
+      )
+
+   with open(CAMINHO_HISTORICO, LEITURA, encoding="latin1") as arquivo:
+      dados = json.load(arquivo)
+      hoje = DateTime.today()
+      
+      print("\nListagem de todos pacotes mais detalhada:")
+      # Percorrendo para trás na array até que, todos cabeçalhos da 'grade'
+      # tenham sido checados, ou tenham se acabado o total de itens da 
+      # array com registros:
+      while (not all(checagem.values())) and abs(indice) <= len(dados):
+         array = dados[indice] 
+         # O três significa a posição que tal dado está na array.
+         antes = DateTime.fromtimestamp(array[3])
+         # Computa quanto tempo já passou.
+         decorrido = (hoje - antes).total_seconds()
+
+         # Ignorando por hora, entradas que tem um valor de tempo não 
+         # convertível.
+         try:
+            decorridostr = tempo(decorrido)
+         except:
+            if __debug__:
+               print("Selo de tempo inválido.")
+            # A saltar, computa próximo índice da array de registros.
+            indice -= 1
+            continue
+
+         # Alguns tem a versão, outras não. Estes últimos ficaram tal lacuna
+         # em "branco".
+         if array[2] is None:
+            versao = "---"
+         else:
+            versao = "v" + array[2]
+
+         nome_do_pacote = array[0]
+         # Nome da linguagem pura para compor a chave que será aplicado um
+         # cálculo hash. O outro é ela formada para visualização.
+         lang = array[-1]
+         linguagem = array[-1].capitalize()
+         # Tupla como o 'nome do pacote' e a respectiva 'linguagem' dele
+         # são a nova chave a calcular o hash.
+         tupla_chave = (nome_do_pacote, lang)
+
+         try:
+            # Apesar de percenter ao grupo de pacotes válidos, neste caso,
+            # ele já foi checado.
+            if checagem[tupla_chave]:
+               indice -= 1
+               continue
+            else:
+               checagem[tupla_chave] = True
+               # Também contabilizando...
+               indice -= 1
+         except KeyError:
+            # A saltar, computa próximo índice da array de registros.
+            indice -= 1
+            # Ignora registro inválido, então pula para o próximo.
+            continue
+
+         print(
+            "{3} - {0:<30} ~ {1} {4:>12} | {2}".format(
+            nome_do_pacote, decorridostr, linguagem, 
+            RECUO, versao
+         ))
+
+         # Se quase a totalidade tiver sido checado, apenas abadona, já 
+         # que, qualquer trabalho a mais que isso é disperdício de CPU e
+         # tempo.
+         if percentual_checked(checagem) >= LIMITE: 
+            break
+
 #  Testes unitários de funções mesmo que sejam auxiliares; classes e seus 
 # métodos acima; até mesmo utilitários da linguagem ou de alguma biblioteca.
-#
 class Unitarios (unittest.TestCase):
    def antigo_dados_para_json (self):
       transforma_antigo_repositorio_em_json()
@@ -446,14 +544,12 @@ class Unitarios (unittest.TestCase):
 
       print("\nO 'repositório' será atualizado?", repository_allowed)
       print("O 'histórico' será atualizado?", history_allowed, end="\n\n")
-   ...
 
    def carregamento_agora_do_json(self):
       M = carrega_do_json()
       print(M.keys())
       chave = "c_e_cplusplus"
       print(M[chave])
-   ...
 
    def simples_adicao_e_verificacao_manual(self):
       novo = {
@@ -463,6 +559,7 @@ class Unitarios (unittest.TestCase):
          "linque": "https://www.exemploinocuo.com",
          "tempo": DateTime.today()
       }
+      print(novo)
       adiciona_novo_registro(novo)
 
    def obtendo_ultima_atualizacao(self):
@@ -470,6 +567,12 @@ class Unitarios (unittest.TestCase):
 
       print("{}".format(legivel.tempo(segs)))
 
+   @unittest.skip("Altera o repositório de forma que pode causar futuros"
+   + " erros ao executar o programa.")
    def anexacao_da_parte_de_c_e_cplusplus(self):
       anexa_c_repositorio()
+
+   def nova_info_dos_pacotes_em_json(self):
+      grade = carrega_do_json()
+      listagem_info_dos_pacotes(grade)
 ...

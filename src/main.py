@@ -11,7 +11,9 @@ from obtencao import baixa_e_metadados as baixa
 from repositorio import (
    aplica_transicao_para_json, 
    carrega_do_json,
-   listagem_do_json
+   listagem_do_json,
+   adiciona_novo_registro,
+   listagem_info_dos_pacotes
 )
 # Foram retirados daqui para organizarem o script principal. Como se podem
 # ver, tais módulos só serve este arquivo:
@@ -43,6 +45,13 @@ def iniciar_programa() -> None:
       lang = ARGS.obtem[0].lower()
 
       (caminho, tempo, versao) = baixa(header, GRADE[lang])
+      # Adicionando metadados do pacote baixado no histórico...
+      linque = GRADE[lang][header]
+      metadados = {
+         "nome": header, "linguagem": lang, "tempo": tempo, 
+         "versao": versao, "linque": linque
+      }
+      adiciona_novo_registro(metadados)
       # Listagem em árvore do que foi baixado:
       print(arvore(caminho, True, GalhoTipo.FINO))
       # Move o arquivo baixado, e extraído em diretório, para o atual aqui.
@@ -55,8 +64,9 @@ def iniciar_programa() -> None:
       print ("Atualiza foi realizada!")
 
    elif ARGS.lista_info:
-      for lang in ["python", "rust"]:
-         listagemI(GRADE, lang)
+      #for lang in ["python", "rust"]:
+      #   listagemI(GRADE, lang)
+      listagem_info_dos_pacotes(GRADE)
 
    else:
       print("Nenhuma opção acionada!")
