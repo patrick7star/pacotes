@@ -4,7 +4,11 @@ CAMINHO = ../versões/pacotes.$(VERSAO).tar
 PYTHON = /usr/bin/python3
 TESTE = cd ./src && pwd && $(PYTHON) -m unittest
 
-testes_unitarios = simples_adicacao_e_verificacao_manual anexacao_da_parte_de_c_e_cplusplus
+testes_unitarios = simples_adicao_e_verificacao_manual \
+						 anexacao_da_parte_de_c_e_cplusplus \
+						 diz_se_jsons_podem_ser_atualizados \
+						 nova_info_dos_pacotes_em_json \
+						 obtendo_ultima_atualizacao
 
 importa-bibliotecas:
 	cp -v $(PYTHON_CODES)/python-utilitarios/bin/legivel.pyc lib/
