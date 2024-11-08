@@ -7,7 +7,7 @@
 # módulos deste programa(foram separados daqui por motivos de organização):
 from gerenciador import (listagem, listagemI)
 from banco_de_dados import (atualiza_bd, grava_pacote_registro, gravaUR)
-from obtencao import baixa_e_metadados as baixa
+from obtencao import (baixa_e_metadados as baixa, baixa_com_metadados)
 from repositorio import (
    aplica_transicao_para_json, 
    carrega_do_json,
@@ -15,6 +15,7 @@ from repositorio import (
    adiciona_novo_registro,
    listagem_info_dos_pacotes
 )
+from atualizacao import (atualiza_historico)
 # Foram retirados daqui para organizarem o script principal. Como se podem
 # ver, tais módulos só serve este arquivo:
 from lincagem import *
@@ -44,7 +45,8 @@ def iniciar_programa() -> None:
       header = ARGS.obtem[1]
       lang = ARGS.obtem[0].lower()
 
-      (caminho, tempo, versao) = baixa(header, GRADE[lang])
+      #(caminho, tempo, versao) = baixa(header, GRADE[lang])
+      (caminho, tempo, versao) = baixa_com_metadados(header, GRADE[lang])
       # Adicionando metadados do pacote baixado no histórico...
       linque = GRADE[lang][header]
       metadados = {
@@ -59,13 +61,9 @@ def iniciar_programa() -> None:
       move_diretorio(Path(caminho), lang, GRADE)
 
    elif ARGS.atualiza:
-      mapa = GRADE
-      atualiza_bd (mapa)
-      print ("Atualiza foi realizada!")
+      atualiza_historico(GRADE)
 
    elif ARGS.lista_info:
-      #for lang in ["python", "rust"]:
-      #   listagemI(GRADE, lang)
       listagem_info_dos_pacotes(GRADE)
 
    else:

@@ -3,6 +3,9 @@
  coloca em valores legíveis o tempo da última alteração realizada.
 """
 
+# O que será exportado?
+__all__ = ["ultima_modificacao", "adiciona_tempoUM", "descobre_versao"]
+
 # módulos do código-fonte:
 from obtencao import faz_download 
 from gerenciador import carrega
@@ -17,11 +20,6 @@ from datetime import timedelta
 # biblioteca externa:
 import legivel
 
-__all__ = [
-   "ultima_modificacao",
-   "adiciona_tempoUM",
-   "descobre_versao"
-]
 
 def extraiDT(zipinfo) -> datetime:
    """
@@ -75,18 +73,16 @@ def descobre_versao(arquivo_zip) -> str:
    """
    if type(arquivo_zip) != ZipFile:
       assert ValueError()
-   # buscando pelo arquivo 'Cargo.toml',...
-   # se não achado retorna 'nada'.
+
    arquivo = None
+   # Buscando pelo arquivo 'Cargo.toml',... se não achado retorna 'nada'.
    for caminho in arquivo_zip.namelist():
       if caminho.endswith("Cargo.toml"):   
          arquivo = arquivo_zip.open(caminho, "r")
-         if __debug__:
-            print("arquivo encontrado!")
          break
-      ...
    else:
       return None
+
    for linha in arquivo:
       # se achar linha, pega o conteúdo
       # após o símbolo de igualdade.
@@ -95,11 +91,10 @@ def descobre_versao(arquivo_zip) -> str:
          trecho = trecho.strip(b"\"\n ")
          arquivo.close()
          return trecho.decode(encoding="ascii")
-      ...
-   ...
+
    arquivo.close()
-   # chega até o fim, sem disparar nada!
-   # Então não há tal linha no arquivo Toml.
+   # Chega até o fim, sem disparar nada! Então não há tal linha no arquivo 
+   # Toml.
    return None
 ...
 

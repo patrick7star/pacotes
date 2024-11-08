@@ -1,15 +1,19 @@
-
-
 """ Pega as versões de cada pacote, seja python ou rust, à cada 5min. """
 
-# biblioteca padrão:
-from datetime import datetime, timedelta
-from math import floor, ceil
+# o que será exportado?!
+__all__ = [
+ "gravaUR", "carregaUR",
+ "grava_pacote_registro",
+ "le_pacote_registro",
+]
+
+# Biblioteca padrão:
+from datetime import (datetime, timedelta)
+from math import (floor, ceil)
 from random import randint
 from shutil import rmtree
 from os.path import join as Join, exists
 from time import sleep
-from unittest import main, TestCase
 from pprint import pprint
 # Funções e dados do próprio projeto.
 from gerenciador import Mapa
@@ -17,13 +21,6 @@ from obtencao import baixa_e_metadados
 # Biblioteca externa:
 from dados import (legivel, CORE_PYTHON as RAIZ)
 
-# o que será exportado?!
-__all__ = [
- "gravaUR", "carregaUR",
- "grava_pacote_registro",
- "le_pacote_registro",
- #"carrega_AB", "grava_AB"
-]
 
 # como é um alternativo ao existente, mudamos
 # temporiariamente o redirecionamento de
@@ -227,7 +224,6 @@ def le_pacote_registro(linguagem: str, cabecalho: str):
    # é um dado válido.
 ...
 
-
 def atualiza_bd(mapa_geral: Mapa) -> None:
    # obtendo informações...
    (e_hora, decorrido, restante) = permitida()
@@ -325,6 +321,10 @@ def grava_AB(valor: bool) -> None:
    ...
 ...
 
+from unittest import (main, TestCase)
+# === === === === === === === === === === === === === === === === === === =
+#                           Testes Unitários
+# === === === === === === === === === === === === === === === === === === = 
 class Funcoes(TestCase):
    def registroDoDatetime(self):
       atual = datetime.today()

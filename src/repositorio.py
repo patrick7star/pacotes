@@ -26,19 +26,21 @@ Templates:
 # o que será exportado?
 __all__ = [
  "aplica_transicao_para_json", "Historico",
-  "transforma_antigo_repositorio_em_json",
-  "listagem_do_json",
-  "adiciona_novo_registro",
-  "listagem_info_dos_pacotes"
+  "transforma_antigo_repositorio_em_json", "listagem_do_json", 
+  "adiciona_novo_registro", "listagem_info_dos_pacotes", 
+  "ultima_atualizacao_realizada"
+  # Constantes:
+  "RECUO", "LEITURA", "ESCRITA", "C_CHAVE", "CAMINHO_JSON_DATA",
+  "CAMINHO_HISTORICO"
 ]
 
 # módulos do próprio programa:
 from gerenciador import (Mapa, carrega)
 from banco_de_dados import carregaUR
-from dados import legivel, PROG_DIR
+from dados import (legivel, PROG_DIR)
 # biblioteca padrão do Python:
 from pathlib import Path, PosixPath
-import json, unittest
+import json
 from os import remove, stat
 from io import TextIOBase
 from datetime import (datetime as DateTime, timedelta as Duration)
@@ -47,7 +49,6 @@ from collections.abc import (Iterator, Sequence)
 from time import time
 # Bibliotecas externas:
 from legivel import (tempo, HORA, DIA)
-
 
 # caminho compatível tanto com Windows como o Linux.
 CAMINHO_JSON_DATA = PROG_DIR.joinpath("data", "repositorios.json")
@@ -58,6 +59,7 @@ RECUO = ' ' * 4
 # Apelidos de alguns retornos:
 (ESCRITA, LEITURA) = ("wt", "rt")
 C_CHAVE = "c++"
+
 
 def transforma_antigo_repositorio_em_json() -> None:
    # carrega dicionário com dados a fazer o JSON, também verifica se ele
@@ -269,12 +271,14 @@ def carrega_do_json() -> Mapa:
    caminho = str(CAMINHO_JSON_DATA)
    stream = open(caminho, "rt", encoding="utf8")
    mapa = json.load(stream)
+
+   stream.close()
    # Excluindo 'selo de tempo' ...
    del mapa["última-atualização"]
    return mapa
 ...
 
-def ultima_atualicao_realizada() -> Duration:
+def ultima_atualizacao_realizada() -> Duration:
    """
      Pega a última atualização, porém não do arquivo original que fazia tal,
    e sim aquele condesado no JSON.
@@ -420,6 +424,11 @@ def anexa_c_repositorio() -> None:
          print("Dados do JSON foram atualizados com sucesso.")
 
 def listagem_info_dos_pacotes(grade: dict) -> None:
+   """
+     Listagem de todos pacotes, porém com mais informação, tipo: o tempo
+   da última vez que ele foi atualizado no GitHub; a linguagem que tal
+   pacote é relacionado; e se houver, a versão do pacote.
+   """
    checagem = {}
    indice = -1
 
@@ -520,8 +529,15 @@ def listagem_info_dos_pacotes(grade: dict) -> None:
          if percentual_checked(checagem) >= LIMITE: 
             break
 
+
+# === === === === === === === === === === === === === === === === === === =
+#                           Testes Unitários
+#
 #  Testes unitários de funções mesmo que sejam auxiliares; classes e seus 
 # métodos acima; até mesmo utilitários da linguagem ou de alguma biblioteca.
+# === === === === === === === === === === === === === === === === === === = 
+import unittest
+
 class Unitarios (unittest.TestCase):
    def antigo_dados_para_json (self):
       transforma_antigo_repositorio_em_json()
@@ -563,7 +579,7 @@ class Unitarios (unittest.TestCase):
       adiciona_novo_registro(novo)
 
    def obtendo_ultima_atualizacao(self):
-      segs = ultima_atualicao_realizada().total_seconds()
+      segs = ultima_atualizacao_realizada().total_seconds()
 
       print("{}".format(legivel.tempo(segs)))
 
