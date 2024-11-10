@@ -187,7 +187,6 @@ def transforma_historico_em_json() -> None:
    else:
       arquivo = open(CAMINHO_HISTORICO, "wt", encoding="latin1")
       json.dump(lista_de_arrays, arquivo, indent=RECUO, ensure_ascii=False)
-   ...
 ...
 
 def permitido_realizar_transformacoes() -> (bool, bool):
@@ -196,12 +195,11 @@ def permitido_realizar_transformacoes() -> (bool, bool):
    contém os linques dos 'pacotes', e o outro é do histórico de downloads
    feitos dos 'pacotes'.
    """
-
    info_do_repositorio = stat(CAMINHO_JSON_DATA)
    info_do_historico = stat(CAMINHO_HISTORICO)
    # Quanto se passou desde a última modificação destes arquivos.
-   decorrido = time() - info_do_repositorio.st_mtime
-   outro_decorrido = time() - info_do_historico.st_mtime
+   decorrido_a = time() - info_do_repositorio.st_mtime
+   decorrido_b = time() - info_do_historico.st_mtime
    # O 'registro de histórico' é alterado mais constantemente, então é
    # necessário que seja atualizado mais rápido:
    LIMITE_DO_HISTORICO = 6 * HORA
@@ -212,28 +210,27 @@ def permitido_realizar_transformacoes() -> (bool, bool):
 
    if __debug__:
       mais_legivel = lambda t: tempo(t, arredonda=True)
-      t = mais_legivel(decorrido)
-      T = mais_legivel(outro_decorrido)
+      t = mais_legivel(decorrido_a)
+      T = mais_legivel(decorrido_b)
 
-      print("atualização do repositório: %s" % t )
-      print("atualização do histórico: %s" % T)
+      print("\nAtualização do repositório: %s" % t )
+      print("Atualização do histórico: %s" % T)
 
-      d = LIMITE_DO_REPOSITORIO - decorrido
-      D = LIMITE_DO_HISTORICO - outro_decorrido
+      d = LIMITE_DO_REPOSITORIO - decorrido_a
+      D = LIMITE_DO_HISTORICO - decorrido_b
       # corrigindo para evitar erros:
       D = 0 if D < 0 else D
       d = 0 if d < 0 else d
 
-      print ("D={}".format(D))
       print(
-         "quanto faltam para atingir: {}({}) e {}({})"
+         "Quanto faltam para atingir: {}({}) e {}({})"
          .format(t, mais_legivel(d), T, mais_legivel(D))
       )
    ...
 
    return (
-      decorrido > LIMITE_DO_REPOSITORIO, 
-      outro_decorrido > LIMITE_DO_HISTORICO
+      decorrido_a > LIMITE_DO_REPOSITORIO, 
+      decorrido_b > LIMITE_DO_HISTORICO
    )
 
 def aplica_transicao_para_json() -> None:
@@ -243,18 +240,20 @@ def aplica_transicao_para_json() -> None:
    if repository_allowed:
       try:
          transforma_antigo_repositorio_em_json()
+         print("O respositório em JSON foi gerado com sucesso ... \u2713")
       except FileExistsError:
-         print("Já existe tal repositório em JSON.")
-         print("removendo '{} ...'".format(CAMINHO_JSON_DATA))
+         print("Já existe tal repositório em JSON ... \U00010102")
+         print("Removendo '{} ...'".format(CAMINHO_JSON_DATA))
          remove(CAMINHO_JSON_DATA)
          transforma_antigo_repositorio_em_json()
 
    if history_allowed:
       try:
          transforma_historico_em_json()
+         print("O histórico em JSON foi gerado com sucesso ... \u2713")
       except FileExistsError:
-         print("Já existe tal repositório em JSON.")
-         print("removendo '{} ...'".format(CAMINHO_HISTORICO))
+         print("Já existe tal histórico em JSON ... \U00010102")
+         print("Removendo '{} ...'".format(CAMINHO_HISTORICO))
          remove(CAMINHO_HISTORICO)
          transforma_historico_em_json()
 
