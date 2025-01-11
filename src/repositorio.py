@@ -191,9 +191,10 @@ def transforma_historico_em_json() -> None:
 
 def permitido_realizar_transformacoes() -> (bool, bool):
    """
-     Algumas permissões de atualizações, primeiro do 'repositório' que 
-   contém os linques dos 'pacotes', e o outro é do histórico de downloads
-   feitos dos 'pacotes'.
+     O algoritmo de atualização segue o seguinte critério: Se tais arquivos
+   existem, então verifica o tempo decorrido desde a última modificação.
+   Caso não tenha sido atualizado até um período limite, então pode-se 
+   permitir atualizar mesmo que o arquivo exista.
    """
    info_do_repositorio = stat(CAMINHO_JSON_DATA)
    info_do_historico = stat(CAMINHO_HISTORICO)
@@ -202,19 +203,16 @@ def permitido_realizar_transformacoes() -> (bool, bool):
    decorrido_b = time() - info_do_historico.st_mtime
    # O 'registro de histórico' é alterado mais constantemente, então é
    # necessário que seja atualizado mais rápido:
-   LIMITE_DO_HISTORICO = 6 * HORA
+   LIMITE_DO_HISTORICO   = 6 * HORA
    # Jà o o repositório é difícil de atualizar, leva dias, semanas,
    # meses,... o que podemos fazer é colocar aqui no mínimo alguns dias
    # para comprovar a diferença.
    LIMITE_DO_REPOSITORIO = 5 * DIA
+   historico_nao_existe   = (not CAMINHO_HISTORICO.exists())
+   repositorio_nao_existe = (not CAMINHO_JSON_DATA.exists())
 
    if __debug__:
-      mais_legivel = lambda t: tempo(t, arredonda=True)
-      t = mais_legivel(decorrido_a)
-      T = mais_legivel(decorrido_b)
-
-      print("\nAtualização do repositório: %s" % t )
-      print("Atualização do histórico: %s" % T)
+      mais_legivel = lambda t: tempo(t, acronomo=True, arredonda=True)
 
       d = LIMITE_DO_REPOSITORIO - decorrido_a
       D = LIMITE_DO_HISTORICO - decorrido_b
@@ -223,37 +221,45 @@ def permitido_realizar_transformacoes() -> (bool, bool):
       d = 0 if d < 0 else d
 
       print(
-         "Quanto faltam para atingir: {}({}) e {}({})"
-         .format(t, mais_legivel(d), T, mais_legivel(D))
+         """
+         Quando já passou, e o máximo que precisa para atualizar:
+            - histórico:   \t{} | {}
+            - repositório: \t{} | {}
+         """.format(
+            mais_legivel(decorrido_a), 
+            mais_legivel(LIMITE_DO_HISTORICO),
+            mais_legivel(decorrido_b),
+            mais_legivel(LIMITE_DO_REPOSITORIO)
+         )
       )
-   ...
 
    return (
-      decorrido_a > LIMITE_DO_REPOSITORIO, 
-      decorrido_b > LIMITE_DO_HISTORICO
+      repositorio_nao_existe, 
+      historico_nao_existe
    )
 
 def aplica_transicao_para_json() -> None:
+   (OKAY, FAIL) = ('\u2713', '\U00010102')
    saida = permitido_realizar_transformacoes()
    (repository_allowed, history_allowed) = saida
 
    if repository_allowed:
       try:
          transforma_antigo_repositorio_em_json()
-         print("O respositório em JSON foi gerado com sucesso ... \u2713")
+         print("O respositório em JSON foi gerado com sucesso ... %s"%OKAY)
       except FileExistsError:
-         print("Já existe tal repositório em JSON ... \U00010102")
-         print("Removendo '{} ...'".format(CAMINHO_JSON_DATA))
+         print("Já existe tal repositório em JSON ... %s" % FAIL)
+         print("Removeu '{}'.".format(CAMINHO_JSON_DATA))
          remove(CAMINHO_JSON_DATA)
          transforma_antigo_repositorio_em_json()
 
    if history_allowed:
       try:
          transforma_historico_em_json()
-         print("O histórico em JSON foi gerado com sucesso ... \u2713")
+         print("O histórico em JSON foi gerado com sucesso ... %s" % OKAY)
       except FileExistsError:
-         print("Já existe tal histórico em JSON ... \U00010102")
-         print("Removendo '{} ...'".format(CAMINHO_HISTORICO))
+         print("Já existe tal histórico em JSON ... %s" % FAIL)
+         print("Removeu '{}'".format(CAMINHO_HISTORICO))
          remove(CAMINHO_HISTORICO)
          transforma_historico_em_json()
 
@@ -462,7 +468,7 @@ def listagem_info_dos_pacotes(grade: dict) -> None:
       dados = json.load(arquivo)
       hoje = DateTime.today()
       
-      print("\nListagem de todos pacotes mais detalhada:")
+      print("\n\nListagem de todos pacotes mais detalhada:", end='\n\n')
       # Percorrendo para trás na array até que, todos cabeçalhos da 'grade'
       # tenham sido checados, ou tenham se acabado o total de itens da 
       # array com registros:
@@ -517,9 +523,9 @@ def listagem_info_dos_pacotes(grade: dict) -> None:
             continue
 
          print(
-            "{3} - {0:<30} ~ {1} {4:>12} | {2}".format(
+               "{3} - {0:<30} ~ {1}\t{4:>12} | {2}".format(
             nome_do_pacote, decorridostr, linguagem, 
-            RECUO, versao
+            RECUO, versao.center(8)
          ))
 
          # Se quase a totalidade tiver sido checado, apenas abadona, já 
@@ -527,11 +533,14 @@ def listagem_info_dos_pacotes(grade: dict) -> None:
          # tempo.
          if percentual_checked(checagem) >= LIMITE: 
             break
+      # Última quebra-de-linha para separar bem a saída de tal função de
+      # demais durante a execução.
+      print("")
 
 
 # === === === === === === === === === === === === === === === === === === =
 #                           Testes Unitários
-#
+# --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- - 
 #  Testes unitários de funções mesmo que sejam auxiliares; classes e seus 
 # métodos acima; até mesmo utilitários da linguagem ou de alguma biblioteca.
 # === === === === === === === === === === === === === === === === === === = 
