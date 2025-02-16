@@ -1,0 +1,30 @@
+{
+    "c++": {
+        "Outros Linques ...": "https://github.com/patrick7star/outros-linques-archive",
+        "Utilitários em C": "https://github.com/patrick7star/utilitarios-em-c/archive/refs/heads/main.zip",
+        "Banco de Vars": "https://github.com/patrick7star/banco-de-variavies/archive/refs/heads/main.zip",
+        "Paineil de Progressos": "https://github.com/patrick7star/gerenciador-de-progressos/archive/refs/heads/main.zip",
+        "Cmd Frequencias": "https://github.com/patrick7star/cmd-frequencia/archive/refs/heads/main.zip"
+    },
+    "python": {
+        "Desligamento Automatico": "https://github.com/patrick7star/desligamento-automatico/archive/refs/heads/main.zip",
+        "Efeito do Matrix": "https://github.com/patrick7star/matrix-efeito/archive/refs/heads/main.zip",
+        "Ferramentas de Tempo": "https://github.com/patrick7star/temporizador-cronometro/archive/refs/heads/main.zip",
+        "Jogo da Forca": "https://github.com/patrick7star/forca/archive/refs/heads/main.zip",
+        "Jogo da Velha": "https://github.com/patrick7star/velha/archive/refs/heads/main.zip",
+        "Pacotes": "https://github.com/patrick7star/pacotes/archive/refs/heads/main.zip",
+        "Utilitarios": "https://github.com/patrick7star/python-utilitarios/archive/refs/heads/main.zip",
+        "Vim Configurações": "https://github.com/patrick7star/minhas-configuracoes-vim/archive/refs/heads/main.zip"
+    },
+    "rust": {
+        "Alterna Wallpapers": "https://github.com/patrick7star/alternador-wallpapers/archive/refs/heads/main.zip",
+        "Bate-Bola": "https://github.com/patrick7star/bate-bola/archive/refs/heads/main.zip",
+        "Buscador de Primos": "https://github.com/patrick7star/primos/archive/refs/heads/main.zip",
+        "Cobrinha Clássica": "https://github.com/patrick7star/cobrinha-classica/archive/refs/heads/main.zip",
+        "Limpa Downloads": "https://github.com/patrick7star/limpa-downloads/archive/refs/heads/main.zip",
+        "Lâmpada Simples": "https://github.com/patrick7star/lampada-simples/archive/refs/heads/main.zip",
+        "Texto Desenhado": "https://github.com/patrick7star/texto-desenhado/archive/refs/heads/main.zip",
+        "Utilitários": "https://github.com/patrick7star/rust-utilitarios/archive/refs/heads/main.zip"
+    },
+    "última-atualização": 1739667284.444378
+}
