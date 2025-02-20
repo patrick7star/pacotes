@@ -13,11 +13,16 @@ funções lá ficam muito entrelaçadas, e poluem tal.
 """
 
 from pathlib import (WindowsPath, Path)
-from shutil import (rmtree, move)
+from shutil import (rmtree, move, Error as ShutilError)
 from stat import (S_IRWXU, S_IXGRP, S_IXOTH)
 from os.path import (isdir, abspath, basename, exists, join)
 from os import (chmod, getenv)
 from dados import PROG_DIR
+import platform
+
+# O que pode ser exportado?
+__all__ = ["alterando_permissao_do_arquivo", "move_diretorio"]
+
 
 def alterando_permissao_do_arquivo() -> None:
    NOME_SRC = "main.py"
@@ -93,21 +98,51 @@ def move_diretorio_python(caminho, destino) -> None:
    move(caminho, ".")
 ...
 
-def move_diretorio(fonte: Path, lang: str, grid: dict) -> bool:
-   destino = Path(".")
-   msg_de_erro = "Linguagem dada '{}' não funciona aqui(por enquanto)."
+def move_diretorio_generico(fonte, destino) -> None:
+    """
+    Qualquer outra não trabalhada, cai aqui, entretanto, é bom criar
+    um algoritmo específico para cada caso.
+    """
+    # Caminho do projeto já existe no atual diretório.
+    projeto = destino.joinpath(fonte.name)
+    msg_warning = (
+        "Como já existe um diretório, e não tem função 'mover' "
+        + "específico, então '%s' será apenas excluído e o novo"
+        + " movido prá cá."
+    )
+    msg_erro = (
+        "Como não possível mover, apenas limpa o que foi já baixado"
+        +" e descompactado em " + str(fonte.parent)
+    )
+    try:
+        move(fonte, destino)
+    except ShutilError:
+        if projeto.exists():
+            print(msg_warning % projeto)
+            rmtree(projeto)
+            print("Projeto '%s' já existente removido." % projeto.name)
+            move(fonte, destino)
+            print("Pacote baixado e extraído movido pra '%s'." % destino)
+        else:    
+            print(msg_erro, fonte.parent)
+            rmtree(fonte)
+            print("Entulho do download removido com sucesso.")
+    finally:
+        pass
 
-   if lang not in grid:
+def move_diretorio(fonte: Path, lang: str, grid: dict) -> bool:
+    destino = Path.cwd()
+    msg_de_erro = "Linguagem dada '{}' não funciona aqui(por enquanto)."
+
+    if lang not in grid:
       raise Exception(msg_de_erro.format(lang))
       abort()
-   ...
 
-   if lang == "rust":
+    if lang == "rust":
       move_diretorio_rust(fonte, destino)
-   elif lang == "python":
+    elif lang == "python":
       move_diretorio_python(fonte, destino)
-   else:
+    else:
       # Qualquer outra não trabalhada, cai aqui, entretanto, é bom criar
       # um algoritmo específico para cada caso.
-      move(fonte, destino)
-...
+      move_diretorio_generico(fonte, destino)
