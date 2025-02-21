@@ -22,7 +22,7 @@ from shutil import move
 from tempfile import gettempdir
 from datetime import datetime
 from pathlib import (Path, )
-from collections.abc import (Sequence)
+from typing import (Sequence, List)
 import _thread as thread
 from time import (sleep)
 # importando outros módulos deste programa:
@@ -166,7 +166,7 @@ def realiza_download(cabecalho: str, linque: str, destino: Path) -> Path:
    return caminho
 
 def realiza_download_simultaneo(entradas: Sequence, destino: Path
- ) -> Path[Sequence]:
+  ) -> Sequence[Path]:
    """
      O mesmo que acima, porém pega uma lista de demandas, e também retorna
    uma lista de caminhos de cada download.

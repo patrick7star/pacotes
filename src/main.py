@@ -9,34 +9,32 @@ from gerenciador import (listagem, listagemI)
 from banco_de_dados import (atualiza_bd, grava_pacote_registro, gravaUR)
 from obtencao import (baixa_e_metadados as baixa, baixa_com_metadados)
 from repositorio import (
-   aplica_transicao_para_json, 
-   carrega_do_json,
-   listagem_do_json,
-   adiciona_novo_registro,
-   listagem_info_dos_pacotes
+   aplica_transicao_para_json, carrega_do_json, listagem_do_json,
+   adiciona_novo_registro, listagem_info_dos_pacotes
 )
 from atualizacao import (atualiza_historico)
 # Foram retirados daqui para organizarem o script principal. Como se podem
 # ver, tais módulos só serve este arquivo:
-from lincagem import *
-from menu import ARGS
-from windows import *
+#from lincagem import *
+from linque   import (cria_linques_simbolicos)
+from menu     import (ARGS)
+from windows  import *
 from manuseio import *
 # biblioteca padrão do Python:
-from pathlib import Path
+from pathlib  import (Path)
 # biblioteca externa:
-from dados import arvore, GalhoTipo, PROG_DIR
+from dados    import (arvore, GalhoTipo, PROG_DIR)
 
 
-def iniciar_programa() -> None:
-   caminho_link = cria_link_simbolico()
+def configuracao_do_ambiente():
+   cria_linques_simbolicos()
    alterando_permissao_do_arquivo()
    aplica_transicao_para_json()
+
+def inicializacao_do_programa() -> None:
+   configuracao_do_ambiente()
    GRADE = carrega_do_json()
 
-   if __debug__:
-      print("O linque foi criado com sucesso?", caminho_link)
-      
    if ARGS.lista is not None:
       listagem_do_json(GRADE)
 
@@ -74,4 +72,4 @@ def iniciar_programa() -> None:
 ...
 
 if __name__ == "__main__":
-   iniciar_programa()
+   inicializacao_do_programa()
