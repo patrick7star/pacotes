@@ -48,7 +48,7 @@ caminho_lib_str = str(caminho_lib)
 path.append(caminho_lib_str)
 # Importando lib externas ao programa:
 import legivel
-from arvore_ii import (arvore, GalhoTipo)
+from arvore import (arvore, GalhoTipo)
 
 # Como é um alternativo ao existente, mudamos temporiariamente o 
 # redirecionamento de gravura/leitura.

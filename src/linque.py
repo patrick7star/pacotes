@@ -14,6 +14,7 @@ __all__ = [
 from os import (symlink, getenv, abort)
 from pathlib import (Path, )
 from sys import argv as Argumentos
+from platform import (system as qual_e_o_sistema)
 
 # Tenta criar linque com nome do programa para o arquivo no "repositório"
 # de linques de programas codificados:
@@ -46,6 +47,14 @@ def caminho_do_script() -> Path:
 
 
 def cria_linques_simbolicos() -> None:
+   # Por enquanto, uma possível criação de repositório de linques, estará
+   # disponível apenas para o sistema Linux.
+   if (qual_e_o_sistema() == "Linux") and (not DIR_LINQUES.exists()):
+       print("Repositório de linques não existe, então criando-o ...", end=" ")
+       DIR_LINQUES.mkdir(parents=True)
+       print("feito!")
+       assert (DIR_LINQUES.exists())
+
    # Linque no repositório de linques:
    destino = DIR_LINQUES.joinpath(NOME_DO_LINQUE)
    fonte = caminho_do_script()
