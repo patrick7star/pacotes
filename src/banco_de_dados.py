@@ -17,7 +17,7 @@ from time import sleep
 from pprint import pprint
 # Funções e dados do próprio projeto.
 from gerenciador import Mapa
-from obtencao import baixa_e_metadados
+from obtencao import (baixa_com_metadados)
 # Biblioteca externa:
 from dados import (legivel, CORE_PYTHON as RAIZ)
 
@@ -162,7 +162,7 @@ def ve_antigo_registro(chave):
    return None;
 ...
 
-def grava_pacote_registro(linguagem: str, cabecalho: str, link: str, 
+def grava_pacote_registro(linguagem: str, cabecalho: str, link: str,
 versao, ultima_alteracao: datetime) -> None:
    """
       Grava um registro de pacote no banco, para que seja facilmente 
@@ -187,7 +187,7 @@ versao, ultima_alteracao: datetime) -> None:
    arquivo.write(linguagem)
    arquivo.write('\n')
    arquivo.close()
-...
+
 def le_pacote_registro(linguagem: str, cabecalho: str):
    # abre arquivo específico dependendo da linguagem.
    if linguagem in ("python", "rust"):

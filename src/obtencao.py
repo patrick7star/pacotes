@@ -1,14 +1,13 @@
 """
-  A parte que baixa o arquivo e descompacta-o, como também move o produto 
-de tais operações serão colocadas aqui, por motivos de organização(mirando 
+  A parte que baixa o arquivo e descompacta-o, como também move o produto
+de tais operações serão colocadas aqui, por motivos de organização(mirando
 a legibilidade).
 """
 
 # o que pode ser importado:
 __all__ = [
-  "baixa_e_metadados", "faz_download", "Metadados", "LinqueError",
-  "realiza_download", "MetadadosI", "baixa_com_metadados",
-  "realiza_download_simultaneo"
+  "Metadados", "LinqueError", "realiza_download", "baixa_com_metadados",
+  "realiza_download_simultaneo", "realiza_download_via_curl"
 ]
 
 # biblioteca padrão do Python:
@@ -27,82 +26,31 @@ import _thread as thread
 from time import (sleep)
 # importando outros módulos deste programa:
 from gerenciador import MiniMapa as MM
+# Bibliotecas de terceiro.
+import pycurl, certifi
 
-# nome do arquivo que será compactado o conteúdo baixado.
-if platform == "win32":
-   ZIPADO = "zipado.zip"
-elif platform == "linux":
-   ZIPADO = "main.zip"
-else:
-   raise Exception("não implementado para tal!")
 DESTINO = gettempdir()
-
 # Apelido de alguns tipos de dados:
-Caminho = str
 Versao = str
+Caminho = Path
 # O último item dela é sua versão(em string, porém apenas números e pontos).
-Metadados = (Caminho, datetime, str)
-MetadadosI = (Path, datetime, Versao)
+Metadados = (Caminho, datetime, Versao)
 
-
-def faz_download(link: str, destino) -> Caminho:
-   " Faz o download em sí, e, por fim, retorna o caminho do zip baixado."
-   from metadados import (ultima_modificacao as UM, descobre_versao)
-   caminho = join(destino, ZIPADO)
-
-   if platform == "win32":
-      array = ["pwsh", "-Command",
-      "Invoke-WebRequest -Uri",
-      link, "-OutFile", caminho]
-   elif platform == "linux":
-      array = ["wget", "--no-cookies", "--quiet", "-P", destino, link]
-
-   # rodando comando em sí.
-   Run(array)
-   # caminho do zip é retornado.
-   return caminho
-...
 
 def descompacta(caminho) -> Caminho:
    """
-      Descompacta o arquivo baixado. Retorna o caminho do diretório 
+      Descompacta o arquivo baixado. Retorna o caminho do diretório
    descompactado no fim.
    """
    archive = ZipFile(caminho)
    # nome do diretório geral dentro dele.
    nome_zip = archive.namelist()[0]
-   nome = join(DESTINO, nome_zip)
+   #nome = join(DESTINO, nome_zip)
    # extraindo seu conteúdo.
    archive.extractall(path=DESTINO)
    archive.close()
    # nome do diretório do arquivo descompactado.
-   return nome
-...
-
-def baixa_e_metadados(cabecalho: str, dicio: MM) -> Metadados:
-   """
-     Baixa e descompacta, dado o específico 'cabeçalho'. O retorno é o
-   seguinte: o caminho para tal diretório descompactado; o tempo decorrido 
-   desde a última alteração; a versão no caso de um Pacote Rust.
-   """
-   caminho = faz_download(dicio[cabecalho], DESTINO)
-
-   # retira a alteração mais recente.
-   with ZipFile(caminho) as arquivo_zip:
-      tempo = UM(arquivo_zip)
-      versao = descobre_versao(arquivo_zip)
-   ...
-   nome_dir = descompacta(caminho)
-   # extrai o trecho "-main" do nome do diretório.
-   novo_nome = join(DESTINO, nome_dir[0:-6])
-   rename(nome_dir, novo_nome)
-   remove(caminho)
-   # retorna o caminho do diretório que foi baixado, descompactado e 
-   # renomeado.
-   caminho = novo_nome
-
-   return (caminho, tempo, versao)
-...
+   return Path(DESTINO).joinpath(nome_zip)
 
 class LinqueError(Exception):
    "Erro para linque inválido"
@@ -159,8 +107,11 @@ def realiza_download(cabecalho: str, linque: str, destino: Path) -> Path:
    if resultado.returncode != 0:
       if __debug__:
          print("Remove resíduo '{}'.".format(caminho.name))
+
       caminho.unlink()
-      raise LinqueError()
+      msg_de_erro = "linque inválido: '{}'".format(linque)
+
+      raise LinqueError(msg_de_erro)
 
    # caminho do zip é retornado.
    return caminho
@@ -190,7 +141,7 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
       nonlocal pool_de_threads, saidas
       ID = thread.get_ident()
       tupla = argumentos
-      
+
       # Adiciona a atual thread no 'pool de threads' da função "global"
       # desta aqui.
       mutex.acquire(); pool_de_threads.append(ID); mutex.release()
@@ -232,24 +183,53 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
 
    return saidas
 
-def baixa_com_metadados(cabecalho: str, grade: MM) -> MetadadosI:
+def realiza_download_via_curl(cabecalho: str, linque: str) -> Path:
+   """
+   Já realiza o download do arquivo no diretório temporário. Isso com um
+   nome até muito difícil de criar 'race conditions'. Retorna o caminho do
+   arquivo que foi baixado(como já dito, este no diretório temporário do
+   atual OS).
+   """
+   obj     = pycurl.Curl()
+   nome    = "{}.zip".format(cria_nome_exotico(cabecalho))
+   caminho = Path(tempfile.gettempdir(), nome)
+   target  = open(caminho, "wb")
+
+   obj.setopt(obj.URL, linque)
+   obj.setopt(obj.WRITEDATA, target)
+   obj.setopt(obj.CAINFO, certifi.where())
+   obj.setopt(obj.FOLLOWLOCATION, True)
+   obj.perform()
+
+   if obj.getinfo(obj.RESPONSE_CODE) != 200:
+      obj.close()
+      target.close()
+      raise LinqueError("Linque inválido")
+
+   obj.close()
+   target.close()
+
+   return caminho
+
+def baixa_com_metadados(cabecalho: str, grade: MM) -> Metadados:
    """
      Baixa e descompacta, dado o específico 'cabeçalho'. O retorno é o
    seguinte: o caminho para tal diretório descompactado; o tempo decorrido 
-   desde a última alteração; a versão no caso de um Pacote Rust.
+   desde a última alteração; a versão no caso de um Pacote Rust. O mesmo que
+   a antiga versão, porém agora mudou o motor de downloads.
    """
    from metadados import (ultima_modificacao, descobre_versao)
 
    linque = grade[cabecalho]
-   destino = Path(DESTINO)
-   caminho_zip = realiza_download(cabecalho, linque, destino)
+   caminho_zip = realiza_download_via_curl(cabecalho, linque)
 
    # retira a alteração mais recente.
    with ZipFile(caminho_zip) as arquivo_zip:
       tempo = ultima_modificacao(arquivo_zip)
       versao = descobre_versao(arquivo_zip)
 
-   diretorio_da_extracao = Path(descompacta(caminho_zip))
+   diretorio_da_extracao = descompacta(caminho_zip)
+   destino = diretorio_da_extracao.parent
    # Extrai o trecho "-main" do nome do diretório.
    nome_do_dir = diretorio_da_extracao.name
    fim = nome_do_dir.index("-main")
@@ -263,16 +243,16 @@ def baixa_com_metadados(cabecalho: str, grade: MM) -> MetadadosI:
 
    return (caminho, tempo, versao)
 
-
 # === === === === === === === === === === === === === === === === === === =
 #                           Testes Unitários
 #                      e alguns Testes de Features
 # === === === === === === === === === === === === === === === === === === = 
-import unittest
+import unittest, tempfile
 from gerenciador import carrega
 from os.path import exists
 from shutil import rmtree
 from random import (choice)
+
 
 class Funcoes(unittest.TestCase):
    def setUp(self):
@@ -287,7 +267,7 @@ class Funcoes(unittest.TestCase):
 
    def downloadEMetadados(self):
       mapa = self.GRADE_RUST
-      info = baixa_e_metadados("Utilitários", mapa)
+      info = baixa_com_metadados("Utilitários", mapa)
 
       print(info)
       self.assertTrue(exists(info[0]))
@@ -374,3 +354,50 @@ class Funcoes(unittest.TestCase):
             print('\t- ', thready, "ainda está ativa.")
          sleep(pausa_thread_principal)
 ...
+
+class DownloadViaCurl(Funcoes):
+   def setUp(self):
+      from repositorio import (carrega_do_json)
+
+      self.grade_geral  = carrega_do_json()
+      self.GRADE_C      = self.grade_geral["c++"]
+      self.GRADE_RUST   = self.grade_geral["rust"]
+      self.GRADE_PYTHON = self.grade_geral["python"]
+      self.contador = 0
+
+      del carrega_do_json
+
+   def tearDown(self):
+      diretorio = Path(tempfile.gettempdir())
+
+      print("Todos arquivos baixados estão sendo removidos ...")
+      for item in diretorio.iterdir():
+         if str(item).endswith("zip"):
+            print("\t\b\b\b- {}".format(item))
+            self.assertTrue(item.exists())
+            item.unlink()
+            self.assertFalse(item.exists())
+
+   def escolha_pacote_aleatorio() -> (str, str):
+      todas_opcoes = list([]).extend(
+         list(self.GRADE_C.keys()) +
+         list(self.GRADE_PYTHON.keys()) +
+         list(self.GRADE_RUST.keys())
+      )
+
+      return choice(todas_opcoes)
+
+   def um_simples_download(self):
+      print("\nDownload todos pacotes Rust ...")
+
+      for (pacote, linque) in self.GRADE_RUST.items():
+         print("Pacote: {}".format(pacote))
+         realiza_download_via_curl(pacote, linque)
+
+   def download_de_linque_invalido(self):
+      for (pacote, linque) in self.GRADE_C.items():
+         print("Pacote: {}".format(pacote))
+         try:
+            realiza_download_via_curl(pacote, linque)
+         except LinqueError:
+            print("Algum problema ao baixar de tal linque.")

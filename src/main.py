@@ -7,7 +7,7 @@
 # módulos deste programa(foram separados daqui por motivos de organização):
 from gerenciador import (listagem, listagemI)
 from banco_de_dados import (atualiza_bd, grava_pacote_registro, gravaUR)
-from obtencao import (baixa_e_metadados as baixa, baixa_com_metadados)
+from obtencao import (baixa_com_metadados)
 from repositorio import (
    aplica_transicao_para_json, carrega_do_json, listagem_do_json,
    adiciona_novo_registro, listagem_info_dos_pacotes
@@ -43,12 +43,11 @@ def inicializacao_do_programa() -> None:
       header = ARGS.obtem[1]
       lang = ARGS.obtem[0].lower()
 
-      #(caminho, tempo, versao) = baixa(header, GRADE[lang])
       (caminho, tempo, versao) = baixa_com_metadados(header, GRADE[lang])
       # Adicionando metadados do pacote baixado no histórico...
       linque = GRADE[lang][header]
       metadados = {
-         "nome": header, "linguagem": lang, "tempo": tempo, 
+         "nome": header, "linguagem": lang, "tempo": tempo,
          "versao": versao, "linque": linque
       }
       adiciona_novo_registro(metadados)

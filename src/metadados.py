@@ -7,7 +7,7 @@
 __all__ = ["ultima_modificacao", "adiciona_tempoUM", "descobre_versao"]
 
 # módulos do código-fonte:
-from obtencao import faz_download 
+from obtencao import (realiza_download_via_curl as faz_download)
 from gerenciador import carrega
 # biblioteca do Python:
 from os import remove
