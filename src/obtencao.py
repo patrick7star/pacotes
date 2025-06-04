@@ -7,16 +7,17 @@ a legibilidade).
 # o que pode ser importado:
 __all__ = [
   "Metadados", "LinqueError", "realiza_download", "baixa_com_metadados",
-  "realiza_download_simultaneo", "realiza_download_via_curl"
+  "realiza_download_simultaneo", "realiza_download_via_curl",
+  "realiza_download_via_curl_por_interface"
 ]
 
-# biblioteca padrão do Python:
+# Biblioteca padrão do Python:
 from os import system, getenv, remove, rename
 from os.path import join, basename
 from sys import platform
 from zipfile import ZipFile
 import subprocess
-from subprocess import run as Run
+from subprocess import (run as Run, Popen)
 from shutil import move
 from tempfile import gettempdir
 from datetime import datetime
@@ -24,10 +25,15 @@ from pathlib import (Path, )
 from typing import (Sequence, List)
 import _thread as thread
 from time import (sleep)
-# importando outros módulos deste programa:
+from platform import (system)
+# Importando outros módulos deste programa:
 from gerenciador import MiniMapa as MM
 # Bibliotecas de terceiro.
-import pycurl, certifi
+try:
+   import pycurl, certifi
+except ModuleNotFoundError:
+   # Informa que tal bibliotecas não foram importadas com sucesso.
+   LIB_CURL_NAO_ENCONTRADA = True
 
 DESTINO = gettempdir()
 # Apelido de alguns tipos de dados:
@@ -62,11 +68,11 @@ class LinqueError(Exception):
 
 def cria_nome_exotico(In: str) -> str:
    """
-     Pega atua nome e formata ele para ser 'único', ou pelo menos um nome 
+     Pega atua nome e formata ele para ser 'único', ou pelo menos um nome
    novo que é difícil entrar em conflito com outros já existentes.
    """
    caracteres = []
-   
+
    for char in In:
       # Troca seus espaços em brancos, ou separadores, por traços.
       if char.isspace() or char == '/':
@@ -95,7 +101,7 @@ def realiza_download(cabecalho: str, linque: str, destino: Path) -> Path:
 
    if platform == "win32":
       comando = [
-         "pwsh", "-Command", "Invoke-WebRequest -Uri", linque, 
+         "pwsh", "-Command", "Invoke-WebRequest -Uri", linque,
          "-OutFile", caminho
       ]
    elif platform == "linux":
@@ -134,7 +140,7 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
    def download(argumentos: tuple[str, str, Path]) -> None:
       """
         Pega uma tupla com todos os principais argumentos necessário para
-      chamar a função 'realiza_download'(que é single-thread). Ela será 
+      chamar a função 'realiza_download'(que é single-thread). Ela será
       executada paralelamente com o código principal. O resultado dela
       será adicionada na lista da função principal.
       """
@@ -160,7 +166,7 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
    # primeiros as entradas da função, e o último a saída.
    for p in range(0, len(entradas), 2):
       header = entradas[p]
-      link = entradas[p + 1] 
+      link = entradas[p + 1]
       tupla_arg = (header, link, destino)
 
       auxiliar.append(tupla_arg)
@@ -175,7 +181,7 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
          print("Thread[%d] chocada com sucesso." % id)
 
    # Tempo de exibição de info das threads em execução.
-   PAUSA = 0.600 
+   PAUSA = 0.600
    # Trecho para aguardar os terminos de todas threads...
    while len(pool_de_threads) > 0:
       print("Downloads em execução(%d)" % len(pool_de_threads))
@@ -214,7 +220,7 @@ def realiza_download_via_curl(cabecalho: str, linque: str) -> Path:
 def baixa_com_metadados(cabecalho: str, grade: MM) -> Metadados:
    """
      Baixa e descompacta, dado o específico 'cabeçalho'. O retorno é o
-   seguinte: o caminho para tal diretório descompactado; o tempo decorrido 
+   seguinte: o caminho para tal diretório descompactado; o tempo decorrido
    desde a última alteração; a versão no caso de um Pacote Rust. O mesmo que
    a antiga versão, porém agora mudou o motor de downloads.
    """
@@ -243,10 +249,44 @@ def baixa_com_metadados(cabecalho: str, grade: MM) -> Metadados:
 
    return (caminho, tempo, versao)
 
-# === === === === === === === === === === === === === === === === === === =
+def realiza_download_via_curl_por_interface(cabecalho: str,
+  linque: str) -> Path:
+   """
+     O resultado é o mesmo que a função original, porém, ao invés de usar uma
+   biblioteca pronta, geralmente por que não há, ele usa os programas
+   instalados do programa que provalvemente já fazem parte. Ele tenta usar
+   tanto a versão do Linux(WSL), como a versão do Windows; muito difícil
+   alguns deles não estarem instalados.
+     O porquê desta função, quando já se tem a original? Bem, quando tentando
+   portar tal software por Windows, mesmo usando WSL, esbarrei com tais
+   restrições. Elas são facilmente contornável, mas exisgem instalar as
+   bibliotecas, o que rejeitei a princípio.
+   """
+   if (not LIB_CURL_NAO_ENCONTRADA):
+      raise ImportError("não foi dado condição para está função")
+
+   CURL_DO_WINDOWS = Path("/mnt/c/Windows/system32/curl.exe")
+   CURL_DO_LINUX = Path("/usr/bin/curl")
+   NOME_PKG = cria_nome_exotico(cabecalho) + ".zip"
+   DESTINO = Path(gettempdir()).joinpath(NOME_PKG)
+
+   if __debug__:
+      print("curl.exe existe? %s" % str(CURL_DO_WINDOWS.exists()))
+      print("curl existe? %s" % str(CURL_DO_LINUX.exists()))
+      print("destino: %s" % DESTINO)
+
+   if system() == "Linux":
+      EXE = "/usr/bin/curl"
+   elif system() == "Windows":
+      raise NotImplementedError()
+
+   Popen([EXE, "-s", "-L", "-o", DESTINO, linque]).wait()
+   return DESTINO
+
+# === === === === === === === === === === === === === === === === === === ===
 #                           Testes Unitários
 #                      e alguns Testes de Features
-# === === === === === === === === === === === === === === === === === === = 
+# === === === === === === === === === === === === === === === === === === ===
 import unittest, tempfile
 from gerenciador import carrega
 from os.path import exists
@@ -319,7 +359,7 @@ class Funcoes(unittest.TestCase):
       self.assertTrue(True)
 
    def lowLevelThreadsUse(self):
-      from _thread import (start_new_thread, get_ident) 
+      from _thread import (start_new_thread, get_ident)
       from time import sleep
       from random import randint
 
@@ -332,15 +372,15 @@ class Funcoes(unittest.TestCase):
          qtd = randint(15, 39)
          ID = get_ident()
 
-         pool_threads.append(ID) 
+         pool_threads.append(ID)
 
          for q in range(1, qtd):
             print("[{}º | {}seg | {}] {} ...".format(q, millis, qtd,  msg))
             sleep(millis)
-         
+
          pool_threads.remove(ID)
 
-      args = ["Banana e Tomate", "Minha vó é uma peça", 
+      args = ["Banana e Tomate", "Minha vó é uma peça",
             "Homens e Mulhres de preto"]
       cursor = 0
       pausa_thread_principal = 1.3
@@ -401,3 +441,28 @@ class DownloadViaCurl(Funcoes):
             realiza_download_via_curl(pacote, linque)
          except LinqueError:
             print("Algum problema ao baixar de tal linque.")
+
+class DownloadViaCurlPorInterface(Funcoes):
+   def setUp(self):
+      # Herdando atributos da útlima construção deste tipo de função.
+      super().setUp()
+
+      self.input = (
+         list(self.GRADE_C.items())       +
+         list(self.GRADE_RUST.items())    +
+         list(self.GRADE_PYTHON.items())
+      )
+
+   def executa(self):
+      remocao = []
+
+      for (pacote, linque) in self.input:
+         print('\t\b\b', pacote, '\n\t\b', linque)
+         path = realiza_download_via_curl_por_interface(pacote, linque)
+         remocao.append(path)
+
+      while len(remocao) > 0:
+         path = remocao.pop()
+         assert(path.exists())
+         path.unlink()
+         assert(not path.exists())

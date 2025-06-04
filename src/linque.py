@@ -18,7 +18,6 @@ from platform import (system as qual_e_o_sistema)
 
 # Tenta criar linque com nome do programa para o arquivo no "repositório"
 # de linques de programas codificados:
-DIR_LINQUES         = Path(getenv("HOME"), getenv("LINKS"))
 MSG_ERROR           = "Não é possível prosseguir com o teste"
 NOME_DO_LINQUE      = Path("pacotes")
 SCRIPT_PRINCIPAL    = "main.py"
@@ -47,6 +46,12 @@ def caminho_do_script() -> Path:
 
 
 def cria_linques_simbolicos() -> None:
+   try:
+      DIR_LINQUES = Path(getenv("HOME"), getenv("LINKS"))
+   except TypeError:
+      mensagem_erro = "não foi encontrado variável de ambiente 'LINKS'"
+      raise ProcessLookupError(mensagem_erro)
+
    # Por enquanto, uma possível criação de repositório de linques, estará
    # disponível apenas para o sistema Linux.
    if (qual_e_o_sistema() == "Linux") and (not DIR_LINQUES.exists()):

@@ -27,7 +27,10 @@ from dados    import (arvore, GalhoTipo, PROG_DIR)
 
 
 def configuracao_do_ambiente():
-   cria_linques_simbolicos()
+   try:
+      cria_linques_simbolicos()
+   except ProcessLookupError:
+      print("Erro na criação de um linque, crie um repositório e variável.")
    alterando_permissao_do_arquivo()
    aplica_transicao_para_json()
 
