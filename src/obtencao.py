@@ -26,6 +26,7 @@ from typing import (Sequence, List)
 import _thread as thread
 from time import (sleep)
 from platform import (system)
+from random import (randint)
 # Importando outros módulos deste programa:
 from gerenciador import MiniMapa as MM
 # Bibliotecas de terceiro.
@@ -80,7 +81,8 @@ def cria_nome_exotico(In: str) -> str:
          continue
 
       # O tipo da atual letra será determinada randomicamente para cada.
-      if choice([True, False]):
+      #if choice([True, False]):
+      if randint(1, 10) <= 5:
          caracteres.append(char.upper())
       else:
          caracteres.append(char)
@@ -270,15 +272,13 @@ def realiza_download_via_curl_por_interface(cabecalho: str,
    NOME_PKG = cria_nome_exotico(cabecalho) + ".zip"
    DESTINO = Path(gettempdir()).joinpath(NOME_PKG)
 
-   if __debug__:
-      print("curl.exe existe? %s" % str(CURL_DO_WINDOWS.exists()))
-      print("curl existe? %s" % str(CURL_DO_LINUX.exists()))
-      print("destino: %s" % DESTINO)
-
    if system() == "Linux":
       EXE = "/usr/bin/curl"
    elif system() == "Windows":
       raise NotImplementedError()
+
+   if DESTINO.exists():
+      raise FileExistsError("arquivo '%s' já foi baixado." % NOME_PKG)
 
    Popen([EXE, "-s", "-L", "-o", DESTINO, linque]).wait()
    return DESTINO
@@ -292,6 +292,10 @@ from gerenciador import carrega
 from os.path import exists
 from shutil import rmtree
 from random import (choice)
+from os import (stat)
+from time import (time)
+from glob import (glob)
+import legivel
 
 
 class Funcoes(unittest.TestCase):
@@ -393,7 +397,6 @@ class Funcoes(unittest.TestCase):
          for thready in pool_threads:
             print('\t- ', thready, "ainda está ativa.")
          sleep(pausa_thread_principal)
-...
 
 class DownloadViaCurl(Funcoes):
    def setUp(self):
@@ -466,3 +469,75 @@ class DownloadViaCurlPorInterface(Funcoes):
          assert(path.exists())
          path.unlink()
          assert(not path.exists())
+
+class ConflitoDevidoAMultiplosDownloads(DownloadViaCurl):
+   """
+      Tenho uma função que faz downloads de arquivos zip, porém ela usa de um
+   truque probabilístico para evitar conflito do downloads de 'zipados' 
+   iguais, ela alterna o nome de forma alternada deles. Isso claro, evita 
+   de alguns conflitem, porém quando falamos em vários, a chance de tal é 
+   coleracionada com com a quantidade de letras do nome do arquivo zipado.
+      O que quero fazer aqui é fazer tal download em massa, forçando para que
+    um erro(o tal conflito) ocorra. O pacote será escolhido de forma 
+    aleatória.
+   """
+   def setUp(self):
+      super().setUp()
+      # Lista de caminhos dos arquivos baixados após o lote de downloads.
+      self.exclusoes = []
+      self.escolha = "Pacotes"
+
+   def tamanho_acumulado(self) -> int:
+      total = 0
+
+      for caminho in glob("/tmp/*.zip"):
+         metadados = stat(caminho)
+         total += metadados.st_size
+      return total
+
+   def probabilidade_de_conflito(self) -> float:
+      # Quantia de zips do pacotes já baixados. Tal termo, aumentará a 
+      # probabilidade de ocorrer tal conflito.
+      r = len(glob("/tmp/*.zip"))
+      # Todos casos posíveis. Neste caso é a quantidade de caractéres na 
+      # string, tudo elevado à 2. Isso pois, cada letra dela tem duas
+      # modalidades, maiúscula ou minúscula.
+      e = len(self.escolha)
+      Q = pow(2, e)
+
+      return (1.0 / (Q - r)) * 100.0
+      
+   def runTest(self):
+      nome = self.escolha
+      linque = self.GRADE_PYTHON[nome]
+      algoritmo = realiza_download_via_curl_por_interface
+      contador = 0
+      (inicio, fim)= (time(), time())
+      PAUSA =0.8 
+
+      while True:
+         fim = time()
+
+         if (fim - inicio) > PAUSA:
+            tamanho = self.tamanho_acumulado()
+            u = legivel.Unidade.BYTE
+            g = legivel.Grandeza.METRICO
+            p = self.probabilidade_de_conflito()
+
+            print(
+               "Já foram baixados %02d pacotes, que equivalem à %s. "
+               "A chance de conflito é %0.1f%%."
+               % (contador, legivel.tamanho(tamanho, u, g), p)
+            )
+            # Reseta a contagem.
+            inicio = time()
+
+         try:
+            algoritmo(nome, linque)
+            contador += 1
+         except KeyboardInterrupt:
+            print("O teste foi parado manualmente.")
+            break
+         except:
+            print("Houve um conflito no nº. de donwload %d." % contador)
+            break
