@@ -7,17 +7,16 @@ a legibilidade).
 # o que pode ser importado:
 __all__ = [
   "Metadados", "LinqueError", "realiza_download", "baixa_com_metadados",
-  "realiza_download_simultaneo", "realiza_download_via_curl",
-  "realiza_download_via_curl_por_interface"
+  "realiza_download_simultaneo", "realiza_download_via_curl"
 ]
 
-# Biblioteca padrão do Python:
+# biblioteca padrão do Python:
 from os import system, getenv, remove, rename
 from os.path import join, basename
 from sys import platform
 from zipfile import ZipFile
 import subprocess
-from subprocess import (run as Run, Popen)
+from subprocess import run as Run
 from shutil import move
 from tempfile import gettempdir
 from datetime import datetime
@@ -25,18 +24,11 @@ from pathlib import (Path, )
 from typing import (Sequence, List)
 import _thread as thread
 from time import (sleep)
-from platform import (system)
-from random import (randint)
-# Importando outros módulos deste programa:
+# importando outros módulos deste programa:
 from gerenciador import MiniMapa as MM
 # Bibliotecas de terceiro.
-try:
-   import pycurl, certifi
-except ModuleNotFoundError:
-   # Informa que tal bibliotecas não foram importadas com sucesso.
-   LIB_CURL_NAO_ENCONTRADA = True
+import pycurl, certifi
 
-DESTINO = gettempdir()
 # Apelido de alguns tipos de dados:
 Versao = str
 Caminho = Path
@@ -49,13 +41,15 @@ def descompacta(caminho) -> Caminho:
       Descompacta o arquivo baixado. Retorna o caminho do diretório
    descompactado no fim.
    """
+   DESTINO = local_de_despejo()
    archive = ZipFile(caminho)
-   # nome do diretório geral dentro dele.
+   # Nome do diretório geral dentro dele.
    nome_zip = archive.namelist()[0]
-   #nome = join(DESTINO, nome_zip)
-   # extraindo seu conteúdo.
+
+   # Extraindo seu conteúdo.
    archive.extractall(path=DESTINO)
    archive.close()
+
    # nome do diretório do arquivo descompactado.
    return Path(DESTINO).joinpath(nome_zip)
 
@@ -69,11 +63,11 @@ class LinqueError(Exception):
 
 def cria_nome_exotico(In: str) -> str:
    """
-     Pega atua nome e formata ele para ser 'único', ou pelo menos um nome
+     Pega atua nome e formata ele para ser 'único', ou pelo menos um nome 
    novo que é difícil entrar em conflito com outros já existentes.
    """
    caracteres = []
-
+   
    for char in In:
       # Troca seus espaços em brancos, ou separadores, por traços.
       if char.isspace() or char == '/':
@@ -81,8 +75,7 @@ def cria_nome_exotico(In: str) -> str:
          continue
 
       # O tipo da atual letra será determinada randomicamente para cada.
-      #if choice([True, False]):
-      if randint(1, 10) <= 5:
+      if choice([True, False]):
          caracteres.append(char.upper())
       else:
          caracteres.append(char)
@@ -142,7 +135,7 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
    def download(argumentos: tuple[str, str, Path]) -> None:
       """
         Pega uma tupla com todos os principais argumentos necessário para
-      chamar a função 'realiza_download'(que é single-thread). Ela será
+      chamar a função 'realiza_download'(que é single-thread). Ela será 
       executada paralelamente com o código principal. O resultado dela
       será adicionada na lista da função principal.
       """
@@ -168,7 +161,7 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
    # primeiros as entradas da função, e o último a saída.
    for p in range(0, len(entradas), 2):
       header = entradas[p]
-      link = entradas[p + 1]
+      link = entradas[p + 1] 
       tupla_arg = (header, link, destino)
 
       auxiliar.append(tupla_arg)
@@ -183,13 +176,14 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
          print("Thread[%d] chocada com sucesso." % id)
 
    # Tempo de exibição de info das threads em execução.
-   PAUSA = 0.600
+   PAUSA = 0.600 
    # Trecho para aguardar os terminos de todas threads...
    while len(pool_de_threads) > 0:
       print("Downloads em execução(%d)" % len(pool_de_threads))
       sleep(PAUSA)
 
    return saidas
+
 
 def realiza_download_via_curl(cabecalho: str, linque: str) -> Path:
    """
@@ -200,7 +194,8 @@ def realiza_download_via_curl(cabecalho: str, linque: str) -> Path:
    """
    obj     = pycurl.Curl()
    nome    = "{}.zip".format(cria_nome_exotico(cabecalho))
-   caminho = Path(tempfile.gettempdir(), nome)
+   #caminho = Path(tempfile.gettempdir(), nome)
+   caminho = local_de_despejo().joinpath(nome)
    target  = open(caminho, "wb")
 
    obj.setopt(obj.URL, linque)
@@ -222,7 +217,7 @@ def realiza_download_via_curl(cabecalho: str, linque: str) -> Path:
 def baixa_com_metadados(cabecalho: str, grade: MM) -> Metadados:
    """
      Baixa e descompacta, dado o específico 'cabeçalho'. O retorno é o
-   seguinte: o caminho para tal diretório descompactado; o tempo decorrido
+   seguinte: o caminho para tal diretório descompactado; o tempo decorrido 
    desde a última alteração; a versão no caso de um Pacote Rust. O mesmo que
    a antiga versão, porém agora mudou o motor de downloads.
    """
@@ -251,51 +246,34 @@ def baixa_com_metadados(cabecalho: str, grade: MM) -> Metadados:
 
    return (caminho, tempo, versao)
 
-def realiza_download_via_curl_por_interface(cabecalho: str,
-  linque: str) -> Path:
+def local_de_despejo() -> Path:
    """
-     O resultado é o mesmo que a função original, porém, ao invés de usar uma
-   biblioteca pronta, geralmente por que não há, ele usa os programas
-   instalados do programa que provalvemente já fazem parte. Ele tenta usar
-   tanto a versão do Linux(WSL), como a versão do Windows; muito difícil
-   alguns deles não estarem instalados.
-     O porquê desta função, quando já se tem a original? Bem, quando tentando
-   portar tal software por Windows, mesmo usando WSL, esbarrei com tais
-   restrições. Elas são facilmente contornável, mas exisgem instalar as
-   bibliotecas, o que rejeitei a princípio.
+     Arranja um diretório de despejo próprio, ao invés de apenas baixar estes
+   pacotes de forma nú no diretório temporário. Tal antiga forma causa
+   conflito por exemplo se o download for realizado no próprio diretório
+   temporário.
    """
-   if (not LIB_CURL_NAO_ENCONTRADA):
-      raise ImportError("não foi dado condição para está função")
+   RAIZ = Path(tempfile.gettempdir())
+   NOME = "pacotes-baixados"
+   result = RAIZ.joinpath(NOME)
 
-   CURL_DO_WINDOWS = Path("/mnt/c/Windows/system32/curl.exe")
-   CURL_DO_LINUX = Path("/usr/bin/curl")
-   NOME_PKG = cria_nome_exotico(cabecalho) + ".zip"
-   DESTINO = Path(gettempdir()).joinpath(NOME_PKG)
+   try:
+      result.mkdir()
+   except FileExistsError:
+      if __debug__:
+         print("O diretório de despejo já está lá!")
+   finally:
+      return result
 
-   if system() == "Linux":
-      EXE = "/usr/bin/curl"
-   elif system() == "Windows":
-      raise NotImplementedError()
-
-   if DESTINO.exists():
-      raise FileExistsError("arquivo '%s' já foi baixado." % NOME_PKG)
-
-   Popen([EXE, "-s", "-L", "-o", DESTINO, linque]).wait()
-   return DESTINO
-
-# === === === === === === === === === === === === === === === === === === ===
+# === === === === === === === === === === === === === === === === === === =
 #                           Testes Unitários
 #                      e alguns Testes de Features
-# === === === === === === === === === === === === === === === === === === ===
+# === === === === === === === === === === === === === === === === === === = 
 import unittest, tempfile
 from gerenciador import carrega
 from os.path import exists
 from shutil import rmtree
 from random import (choice)
-from os import (stat)
-from time import (time)
-from glob import (glob)
-import legivel
 
 
 class Funcoes(unittest.TestCase):
@@ -363,7 +341,7 @@ class Funcoes(unittest.TestCase):
       self.assertTrue(True)
 
    def lowLevelThreadsUse(self):
-      from _thread import (start_new_thread, get_ident)
+      from _thread import (start_new_thread, get_ident) 
       from time import sleep
       from random import randint
 
@@ -376,15 +354,15 @@ class Funcoes(unittest.TestCase):
          qtd = randint(15, 39)
          ID = get_ident()
 
-         pool_threads.append(ID)
+         pool_threads.append(ID) 
 
          for q in range(1, qtd):
             print("[{}º | {}seg | {}] {} ...".format(q, millis, qtd,  msg))
             sleep(millis)
-
+         
          pool_threads.remove(ID)
 
-      args = ["Banana e Tomate", "Minha vó é uma peça",
+      args = ["Banana e Tomate", "Minha vó é uma peça", 
             "Homens e Mulhres de preto"]
       cursor = 0
       pausa_thread_principal = 1.3
@@ -445,99 +423,50 @@ class DownloadViaCurl(Funcoes):
          except LinqueError:
             print("Algum problema ao baixar de tal linque.")
 
-class DownloadViaCurlPorInterface(Funcoes):
+class LocalDeDespejo(unittest.TestCase):
    def setUp(self):
-      # Herdando atributos da útlima construção deste tipo de função.
-      super().setUp()
+      self.diretorio = None
 
-      self.input = (
-         list(self.GRADE_C.items())       +
-         list(self.GRADE_RUST.items())    +
-         list(self.GRADE_PYTHON.items())
-      )
+   def tearDown(self):
+      if self.diretorio is not None:
+         self.diretorio.rmdir()
+         self.assertFalse(self.diretorio.exists())
 
-   def executa(self):
-      remocao = []
-
-      for (pacote, linque) in self.input:
-         print('\t\b\b', pacote, '\n\t\b', linque)
-         path = realiza_download_via_curl_por_interface(pacote, linque)
-         remocao.append(path)
-
-      while len(remocao) > 0:
-         path = remocao.pop()
-         assert(path.exists())
-         path.unlink()
-         assert(not path.exists())
-
-class ConflitoDevidoAMultiplosDownloads(DownloadViaCurl):
-   """
-      Tenho uma função que faz downloads de arquivos zip, porém ela usa de um
-   truque probabilístico para evitar conflito do downloads de 'zipados' 
-   iguais, ela alterna o nome de forma alternada deles. Isso claro, evita 
-   de alguns conflitem, porém quando falamos em vários, a chance de tal é 
-   coleracionada com com a quantidade de letras do nome do arquivo zipado.
-      O que quero fazer aqui é fazer tal download em massa, forçando para que
-    um erro(o tal conflito) ocorra. O pacote será escolhido de forma 
-    aleatória.
-   """
-   def setUp(self):
-      super().setUp()
-      # Lista de caminhos dos arquivos baixados após o lote de downloads.
-      self.exclusoes = []
-      self.escolha = "Pacotes"
-
-   def tamanho_acumulado(self) -> int:
-      total = 0
-
-      for caminho in glob("/tmp/*.zip"):
-         metadados = stat(caminho)
-         total += metadados.st_size
-      return total
-
-   def probabilidade_de_conflito(self) -> float:
-      # Quantia de zips do pacotes já baixados. Tal termo, aumentará a 
-      # probabilidade de ocorrer tal conflito.
-      r = len(glob("/tmp/*.zip"))
-      # Todos casos posíveis. Neste caso é a quantidade de caractéres na 
-      # string, tudo elevado à 2. Isso pois, cada letra dela tem duas
-      # modalidades, maiúscula ou minúscula.
-      e = len(self.escolha)
-      Q = pow(2, e)
-
-      return (1.0 / (Q - r)) * 100.0
-      
    def runTest(self):
-      nome = self.escolha
-      linque = self.GRADE_PYTHON[nome]
-      algoritmo = realiza_download_via_curl_por_interface
-      contador = 0
-      (inicio, fim)= (time(), time())
-      PAUSA =0.8 
+      caminho = local_de_despejo()
+      self.diretorio = caminho
+      dir_str = str(caminho)
 
-      while True:
-         fim = time()
+      self.assertTrue(caminho.exists())
+      print("Caminho dos downloads: %s" % dir_str)
 
-         if (fim - inicio) > PAUSA:
-            tamanho = self.tamanho_acumulado()
-            u = legivel.Unidade.BYTE
-            g = legivel.Grandeza.METRICO
-            p = self.probabilidade_de_conflito()
+class DownloadDoProprioProgramaNoLocal(unittest.TestCase):
+   def setUp(self):
+      from repositorio import (carrega_do_json)
 
-            print(
-               "Já foram baixados %02d pacotes, que equivalem à %s. "
-               "A chance de conflito é %0.1f%%."
-               % (contador, legivel.tamanho(tamanho, u, g), p)
-            )
-            # Reseta a contagem.
-            inicio = time()
+      self.grade_geral  = carrega_do_json()
+      self.GRADE        = self.grade_geral["python"]
+      self.download     = baixa_com_metadados
+      self.diretorio    = None
 
-         try:
-            algoritmo(nome, linque)
-            contador += 1
-         except KeyboardInterrupt:
-            print("O teste foi parado manualmente.")
-            break
-         except:
-            print("Houve um conflito no nº. de donwload %d." % contador)
-            break
+      del carrega_do_json
+
+   def tearDown(self):
+      self.assertTrue(self.dir.exists())
+
+      if self.dir is not None:
+         rmtree(self.dir)
+         self.assertFalse(self.dir.exists())
+         # Excluindo também local de despejo:
+         local = self.dir.parent
+         print("Despejo: '%s'" % str(local))
+         self.assertTrue(local.exists())
+         self.dir.parent.rmdir()
+         self.assertFalse(local.exists())
+
+   def runTest(self):
+      pkg      = "Pacotes"
+      result   = self.download(pkg, self.GRADE)
+      (self.dir, _, _) = result
+
+      self.assertTrue(self.dir.exists())
