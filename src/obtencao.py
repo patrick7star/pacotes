@@ -10,10 +10,10 @@ __all__ = [
   "realiza_download_simultaneo", "realiza_download_via_curl"
 ]
 
-# biblioteca padrão do Python:
+# Biblioteca padrão do Python:
 from os import system, getenv, remove, rename
 from os.path import join, basename
-from sys import platform
+from sys import (platform, stderr)
 from zipfile import ZipFile
 import subprocess
 from subprocess import run as Run
@@ -24,10 +24,15 @@ from pathlib import (Path, )
 from typing import (Sequence, List)
 import _thread as thread
 from time import (sleep)
-# importando outros módulos deste programa:
+from platform import (release, system)
+from subprocess import (Popen)
+# Importando outros módulos deste programa:
 from gerenciador import MiniMapa as MM
 # Bibliotecas de terceiro.
-import pycurl, certifi
+try:
+   import pycurl, certifi
+except ModuleNotFoundError:
+   print("Bibliotecas 'pycurl' e 'certifi' não disponíveis.")
 
 # Apelido de alguns tipos de dados:
 Versao = str
@@ -184,7 +189,6 @@ def realiza_download_simultaneo(entradas: Sequence, destino: Path
 
    return saidas
 
-
 def realiza_download_via_curl(cabecalho: str, linque: str) -> Path:
    """
    Já realiza o download do arquivo no diretório temporário. Isso com um
@@ -224,7 +228,16 @@ def baixa_com_metadados(cabecalho: str, grade: MM) -> Metadados:
    from metadados import (ultima_modificacao, descobre_versao)
 
    linque = grade[cabecalho]
-   caminho_zip = realiza_download_via_curl(cabecalho, linque)
+   try:
+      # O algoritmo padrão é a biblioteca externa 'pycurl' pro Python.
+      caminho_zip = realiza_download_via_curl(cabecalho, linque)
+   except NameError:
+      # Caso não dê, tente achar o programa, e embrulha-lo como uma lib.
+      algoritmo_de_download = realiza_download_via_curl_por_interface
+      caminho_zip = algoritmo_de_download(cabecalho, linque)
+      print("Usou 'curl' via interface.")
+   else:
+      pass
 
    # retira a alteração mais recente.
    with ZipFile(caminho_zip) as arquivo_zip:
@@ -265,6 +278,58 @@ def local_de_despejo() -> Path:
    finally:
       return result
 
+def realiza_download_via_curl_por_interface(cabecalho: str,
+  linque: str) -> Path:
+   """
+     O resultado é o mesmo que a função original, porém, ao invés de usar uma
+   biblioteca pronta, geralmente por que não há, ele usa os programas
+   instalados do programa que provalvemente já fazem parte. Ele tenta usar
+   tanto a versão do Linux(WSL), como a versão do Windows; muito difícil
+   alguns deles não estarem instalados.
+     O porquê desta função, quando já se tem a original? Bem, quando tentando
+   portar tal software por Windows, mesmo usando WSL, esbarrei com tais
+   restrições. Elas são facilmente contornável, mas exisgem instalar as
+   bibliotecas, o que rejeitei a princípio.
+   """
+   #if (not LIB_CURL_NAO_ENCONTRADA):
+   #   raise ImportError("não foi dado condição para está função")
+
+   CURL_DO_WINDOWS = Path("/mnt/c/Windows/system32/curl.exe")
+   CURL_DO_LINUX = Path("/usr/bin/curl")
+   NOME_PKG = cria_nome_exotico(cabecalho) + ".zip"
+   DESTINO = Path(gettempdir()).joinpath(NOME_PKG)
+   # Proposições sobre o sistema operacional utilizado:
+   NUMA_WSL = ("WSL2" in release() or "microsoft" in release())
+   PLATAFORMA_WINDOWS = (system() == "Windows")
+   PLATAFORMA_LINUX = (system() == "Linux" and (not NUMA_WSL))
+   PLATAFORMA_WSL = (system() == "Linux" and NUMA_WSL)
+
+   if PLATAFORMA_LINUX:
+      EXE = "/usr/bin/curl"
+
+      if not CURL_DO_LINUX.exists():
+         raise SystemError("não há um programa '%s'" % CURL_DO_LINUX)
+      if __debug__:
+         print("Você está em Linux puro.")
+
+   elif PLATAFORMA_WSL:
+      EXE = str(CURL_DO_LINUX)
+
+      if not CURL_DO_LINUX.exists():
+         raise SystemError("não há um programa '%s'" % CURL_DO_LINUX)
+      if __debug__:
+         print("Você está num Linux(WSL)")
+
+   elif system() == "Windows":
+      raise NotImplementedError()
+      if not CURL_DO_WINDOWS.exists():
+         raise SystemError("não há um programa '%s'" % CURL_DO_WINDOWS)
+
+   if DESTINO.exists():
+      raise FileExistsError("arquivo '%s' já foi baixado." % NOME_PKG)
+
+   Popen([EXE, "-s", "-L", "-o", DESTINO, linque]).wait()
+   return DESTINO
 # === === === === === === === === === === === === === === === === === === =
 #                           Testes Unitários
 #                      e alguns Testes de Features
@@ -391,7 +456,7 @@ class DownloadViaCurl(Funcoes):
    def tearDown(self):
       diretorio = Path(tempfile.gettempdir())
 
-      print("Todos arquivos baixados estão sendo removidos ...")
+      print("\nTodos arquivos baixados estão sendo removidos ...")
       for item in diretorio.iterdir():
          if str(item).endswith("zip"):
             print("\t\b\b\b- {}".format(item))
@@ -470,3 +535,30 @@ class DownloadDoProprioProgramaNoLocal(unittest.TestCase):
       (self.dir, _, _) = result
 
       self.assertTrue(self.dir.exists())
+
+class RealizaDownloadViaCurlPorInterface(DownloadViaCurl):
+   def setUp(self):
+      # Executando o antigo ...
+      super().setUp();
+
+      escolha = choice([
+         self.GRADE_C, 
+         self.GRADE_RUST, 
+         self.GRADE_PYTHON
+      ])
+      self.cabecalho = choice(list(escolha.keys()))
+      self.linque = escolha[self.cabecalho]
+
+   def runTest(self):
+      SEP = "\n\t\b\b- "
+      L = self.linque
+      C = self.cabecalho
+
+      print(
+         "\nO que foi escolhido é:", 
+         self.cabecalho, self.linque, 
+         sep=SEP, end="\n\n"
+      )
+      result = realiza_download_via_curl_por_interface(C, L)
+      print("Baixado: '{}'".format(result))
+    
