@@ -44,3 +44,9 @@ clean:
 	rm --force --verbose $(LINKS)/pacotes
 	@echo "removendo pré-compilados bytecodes."
 	find -name *pycache* -exec rm -rv '{}' ';'
+
+extrai-lib:
+	@tar -xf lib/externo.tar
+	@echo "O tarball 'externo' foi extraído."
+	@mv tree/ legivel.py arvore.py lib/
+	@echo "Os arquivos despejados foram movidos prá 'lib'."
